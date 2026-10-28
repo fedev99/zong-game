@@ -159,26 +159,26 @@
   <!-- MODALE LOBBY STANZA ONLINE -->
   <div id="roomModal" class="fixed inset-0 bg-zinc-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
-      <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-amber-500 flex items-center justify-center text-zinc-950 font-black text-2xl font-display">Z</div>
+      <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-red-300 to-red-600 flex items-center justify-center shadow-lg shadow-red-500/25 text-zinc-950 font-black text-2xl font-display">Z</div>
       <h2 class="text-xl font-black text-white font-display mb-1">ZONG ONLINE</h2>
       <p class="text-xs text-zinc-400 mb-5">Inserisci il tuo nome e il codice della stanza per accedere</p>
       
       <div class="space-y-3 text-left">
         <div>
           <label class="text-[10px] uppercase font-bold text-zinc-400 block mb-1">Il tuo Nome</label>
-          <input id="inputPlayerName" type="text" maxlength="12" placeholder="Es. Tex" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-white font-semibold text-sm focus:outline-none focus:border-amber-400" />
+          <input id="inputPlayerName" type="text" maxlength="12" placeholder="Es. Tex" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-white font-semibold text-sm focus:outline-none focus:border-red-400" />
         </div>
         <div>
           <label class="text-[10px] uppercase font-bold text-zinc-400 block mb-1">Codice Stanza</label>
-          <input id="inputRoomCode" type="text" placeholder="Es. tavolo123" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-white font-semibold text-sm focus:outline-none focus:border-amber-400" />
+          <input id="inputRoomCode" type="text" placeholder="Es. tavolo123" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-white font-semibold text-sm focus:outline-none focus:border-red-400" />
         </div>
         <div id="containerTargetScore" class="hidden">
-          <label class="text-[10px] uppercase font-bold text-amber-400 block mb-1">Punteggio Massimo Stanza</label>
-          <input id="inputTargetScore" type="number" step="500" min="1000" value="10000" placeholder="Es. 10000" class="w-full bg-zinc-950 border border-amber-500/60 rounded-xl px-3 py-2 text-amber-300 font-semibold text-sm focus:outline-none focus:border-amber-400" />
+          <label class="text-[10px] uppercase font-bold text-red-400 block mb-1">Punteggio Massimo Stanza</label>
+          <input id="inputTargetScore" type="number" step="500" min="1000" value="10000" placeholder="Es. 10000" class="w-full bg-zinc-950 border border-red-500/60 rounded-xl px-3 py-2 text-red-300 font-semibold text-sm focus:outline-none focus:border-red-400" />
         </div>
       </div>
 
-      <button id="btnJoinRoom" class="w-full mt-5 py-3.5 rounded-xl bg-amber-500 text-zinc-950 font-black text-sm font-display shadow-lg active:scale-95 transition">Entra nella Stanza</button>
+      <button id="btnJoinRoom" class="w-full mt-5 py-3.5 rounded-xl bg-red-500 hover:bg-red-600 text-zinc-950 font-black text-sm font-display shadow-lg shadow-red-500/25 active:scale-95 transition">Entra nella Stanza</button>
     </div>
   </div>
 
