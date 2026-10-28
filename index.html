@@ -530,15 +530,15 @@
 <div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-        <!-- Contenitore verticale per titolo+icona sopra e sottotitolo sotto -->
-        <div class="flex flex-col">
-          <!-- Riga 1: Icona affiancata al titolo -->
-          <div class="flex items-center gap-2">
-            <i data-lucide="trophy" class="w-5 h-5 text-emerald-300"></i>
+        <!-- Contenitore flessibile: affianca l'icona al blocco di testo -->
+        <div class="flex items-center gap-2">
+          <i data-lucide="trophy" class="w-5 h-5 text-emerald-300"></i>
+          
+          <!-- Blocco di testo: h3 e p uno sotto l'altro -->
+          <div>
             <h3 class="text-base font-bold text-emerald-300 font-display">Classifica Punti Partita</h3>
+            <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
           </div>
-          <!-- Riga 2: Sottotitolo allineato a capo partendo da sotto l'icona -->
-          <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
         </div>
 
         <button id="btnCloseLeaderboard"><i data-lucide="x" class="w-5 h-5"></i></button>
