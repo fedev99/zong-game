@@ -282,8 +282,8 @@
         <span id="targetScoreHeaderLabel" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <!-- BOTTONE RECORD CON STESSO SFONDO DEGLI ALTRI E TESTO PINK -->
-      <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-pink-400 text-xs font-semibold flex items-center gap-1 transition">
+      <!-- BOTTONE RECORD CON NUOVO COLORE NELLA NAVBAR -->
+      <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-pink-600/20 border border-pink-500/50 text-pink-300 text-xs font-semibold flex items-center gap-1 hover:bg-pink-600/30 transition">
         <i data-lucide="trophy" class="w-4 h-4 text-pink-400"></i>
         <span class="hidden sm:inline">Record</span>
       </button>
@@ -757,8 +757,8 @@
       playerIds: {},   
       playerNames: {},
       scores: {},
-      records: {},          
-      inheritedRecords: {}, 
+      records: {},          // Record scalato (puro, da 5 dadi)
+      inheritedRecords: {}, // Record con eredità (totale turno)
       hasEntered: {},
       zongCounts: {},
       totalRolls: {},
@@ -942,6 +942,7 @@
     const leaderboardContainer = document.getElementById('leaderboardContainer');
     const leaderboardTargetLabel = document.getElementById('leaderboardTargetLabel');
     
+    // Modale Record & Doppia Classifica
     const btnRecordsModal = document.getElementById('btnRecordsModal');
     const recordsModal = document.getElementById('recordsModal');
     const btnCloseRecords = document.getElementById('btnCloseRecords');
@@ -984,6 +985,7 @@
     const btnCancelTargetScore = document.getElementById('btnCancelTargetScore');
     const btnSaveTargetScore = document.getElementById('btnSaveTargetScore');
 
+    // Elementi Chat
     const chatLogContainer = document.getElementById('chatLogContainer');
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
@@ -1387,6 +1389,7 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    // Classifica generale punti stanza (con nome colorato)
     function renderLeaderboard() {
       if (!leaderboardContainer) return;
       if (leaderboardTargetLabel) {
@@ -1414,6 +1417,7 @@
       });
     }
 
+    // Doppia classifica record nel modale Record (con nomi colorati)
     function renderRecordsModals() {
       if (!scaledRecordsContainer || !inheritedRecordsContainer) return;
       
@@ -1857,8 +1861,7 @@
       await saveStateToCloud();
     }
 
-    // GESTIONE ACCESSO E RIENTRO: Ricarica pagina automatica senza prompt, prompt solo se usciti volontariamente
-    async function joinRoomProcess(name, code, targetScoreFromInput, isPageReload = false) {
+    async function joinRoomProcess(name, code, targetScoreFromInput) {
       roomCode = code;
 
       try {
@@ -1896,34 +1899,22 @@
           let existingPlayerIndex = -1;
 
           for (let i = 1; i <= GameState.numPlayers; i++) {
-            if (GameState.playerIds[i] === myPlayerId) {
+            if (GameState.playerIds[i] === myPlayerId || GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
               existingPlayerIndex = i;
               break;
-            } else if (GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
-              existingPlayerIndex = i;
             }
           }
 
           if (existingPlayerIndex !== -1) {
-            // Se è un refresh di pagina o l'ID coincide già, rientra senza chiedere
-            if (isPageReload || GameState.playerIds[existingPlayerIndex] === myPlayerId) {
+            const confirmReentry = confirm(`Il giocatore "${name}" risulta già registrato in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
+            if (confirmReentry) {
               myPlayerId = GameState.playerIds[existingPlayerIndex];
               GameState.playerNames[existingPlayerIndex] = name;
               setCookie("zong_my_player_id", myPlayerId);
               localStorage.setItem("zong_my_player_id", myPlayerId);
               await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
             } else {
-              // Chiedi conferma solo se l'utente era uscito esplicitamente e rientra con lo stesso nome
-              const confirmReentry = confirm(`Il giocatore "${name}" risulta già registrato in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
-              if (confirmReentry) {
-                myPlayerId = GameState.playerIds[existingPlayerIndex];
-                GameState.playerNames[existingPlayerIndex] = name;
-                setCookie("zong_my_player_id", myPlayerId);
-                localStorage.setItem("zong_my_player_id", myPlayerId);
-                await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
-              } else {
-                return false;
-              }
+              return false;
             }
           } else {
             GameState.numPlayers++;
@@ -2002,7 +1993,7 @@
 
       triggerHaptic(25);
       const tScore = parseInt(inputTargetScore.value) || 10000;
-      await joinRoomProcess(name, code, tScore, false);
+      await joinRoomProcess(name, code, tScore);
     });
 
     if (btnLeaveRoom) {
@@ -2030,9 +2021,8 @@
       if (savedName) inputPlayerName.value = savedName;
       if (savedRoom) inputRoomCode.value = savedRoom;
 
-      // Riconnessione automatica al caricamento/aggiornamento pagina (F5) senza prompt di omonimia
       if (savedName && savedRoom) {
-        await joinRoomProcess(savedName, savedRoom, 10000, true);
+        await joinRoomProcess(savedName, savedRoom);
       }
 
       btnRoll.addEventListener('click', () => { if (isMyTurn()) triggerHaptic(20); sound.init(); rollDice(); });
