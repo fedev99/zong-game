@@ -185,7 +185,7 @@
   <!-- MODALE SELEZIONE GIOCATORI NUOVA PARTITA -->
   <div id="newGameModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full text-center">
-      <h3 class="text-base font-bold text-white font-display mb-1">Seleziona Giocatori</h3>
+      <h3 class="text-base font-bold text-red-300 font-display mb-1">Seleziona Giocatori</h3>
       <p class="text-xs text-zinc-400 mb-4">Scegli chi parteciperà alla nuova partita (l'ordine di gioco verrà estratto a caso):</p>
       <div id="playerSelectList" class="space-y-2 text-left mb-4 max-h-48 overflow-y-auto"></div>
       
@@ -208,7 +208,7 @@
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-xs w-full shadow-2xl">
       <div class="flex items-center gap-2 mb-2 text-amber-400">
         <i data-lucide="target" class="w-5 h-5"></i>
-        <h3 class="text-base font-bold text-white font-display">Punteggio Massimo</h3>
+        <h3 class="text-base font-bold text-amber-400 font-display">Punteggio Massimo</h3>
       </div>
       <p class="text-xs text-zinc-400 mb-3">Scegli o inserisci il punteggio necessario per vincere la partita:</p>
       
@@ -233,7 +233,7 @@
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
         <div class="flex items-center gap-2 text-orange-400">
            <i data-lucide="award" class="w-4 h-4 text-orange-400"></i>
-          <h3 class="text-base font-bold text-orange font-display">Classifica Record</h3>
+          <h3 class="text-base font-bold text-orange-400 font-display">Classifica dei Record</h3>
         </div>
         <button id="btnCloseRecords" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
@@ -250,14 +250,14 @@
         </div>
       </div>
       
-      <button id="btnGotItRecords" class="w-full py-2.5 rounded-xl bg-orange-600 text-white font-bold text-xs mt-3">Chiudi</button>
+      <button id="btnGotItRecords" class="w-full py-2.5 rounded-xl bg-orange-600 text-zinc-950 font-bold text-xs mt-3">Chiudi</button>
     </div>
   </div>
 
   <!-- Header -->
   <header class="w-full max-w-5xl mx-auto py-2 flex items-center justify-between border-b border-zinc-800/80">
     <div class="flex items-center space-x-2.5">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-MediumAquaMarine-400 to-MediumAquaMarine-600 flex items-center justify-center shadow-lg shadow-MediumAquaMarine-500/20 text-zinc-950 font-black text-xl font-display">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-esmerald-400 to-esmerald-600 flex items-center justify-center shadow-lg shadow-esmerald-500/20 text-zinc-950 font-black text-xl font-display">
         Z
       </div>
       <div>
@@ -282,7 +282,7 @@
         <span id="targetScoreHeaderLabel" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <!-- BOTTONE RECORD CON STESSO SFONDO DEGLI ALTRI E SOLO TESTO PINK -->
+      <!-- BOTTONE RECORD CON STESSO SFONDO DEGLI ALTRI E SOLO TESTO ORANGE -->
       <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-orange-400 text-xs font-semibold flex items-center gap-1 transition">
         <i data-lucide="award" class="w-4 h-4 text-orange-400"></i>
         <span class="hidden sm:inline">Record</span>
@@ -506,7 +506,8 @@
   <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-md w-full max-h-[80vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-        <h3 class="text-base font-bold text-white font-display">Regole ZONG (5 Dadi)</h3>
+         <i data-lucide="trophy" class="w-5 h-5 text-purple-300"></i>
+        <h3 class="text-base font-bold text-purple-300 font-display">Regole ZONG (5 Dadi)</h3>
         <button id="btnCloseRules" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="overflow-y-auto space-y-3 py-3 text-xs text-zinc-300">
@@ -527,7 +528,8 @@
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
         <div>
-          <h3 class="text-base font-bold text-white font-display">Classifica Punti Partita</h3>
+          <i data-lucide="trophy" class="w-5 h-5 text-esmerald-300"></i>
+          <h3 class="text-base font-bold text-esmerald-300 font-display">Classifica Punti Partita</h3>
           <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
         </div>
         <button id="btnCloseLeaderboard"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -1443,7 +1445,7 @@
             <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
             <span class="text-xs font-bold" style="color: ${playerColor}">${getPlayerName(p.id)}</span>
           </div>
-          <span class="text-xs font-black text-pink-300">${p.score} pt</span>
+          <span class="text-xs font-black text-red-300">${p.score} pt</span>
         `;
         scaledRecordsContainer.appendChild(row);
       });
@@ -1457,7 +1459,7 @@
             <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
             <span class="text-xs font-bold" style="color: ${playerColor}">${getPlayerName(p.id)}</span>
           </div>
-          <span class="text-xs font-black text-cyan-300">${p.score} pt</span>
+          <span class="text-xs font-black text-orange-300">${p.score} pt</span>
         `;
         inheritedRecordsContainer.appendChild(row);
       });
