@@ -227,7 +227,7 @@
     </div>
   </div>
 
-  <!-- MODALE RECORD (Doppia Classifica) -->
+  <!-- MODALE RECORD -->
   <div id="recordsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
@@ -282,8 +282,8 @@
         <span id="targetScoreHeaderLabel" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <!-- BOTTONE RECORD CON NUOVO COLORE NELLA NAVBAR -->
-      <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-pink-600/20 border border-pink-500/50 text-pink-300 text-xs font-semibold flex items-center gap-1 hover:bg-pink-600/30 transition">
+      <!-- BOTTONE RECORD AGGIORNATO (STESSO SFONDO DEGLI ALTRI, TESTO PINK) -->
+      <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-pink-400 text-xs font-semibold flex items-center gap-1 hover:border-pink-500/50 transition">
         <i data-lucide="trophy" class="w-4 h-4 text-pink-400"></i>
         <span class="hidden sm:inline">Record</span>
       </button>
@@ -564,9 +564,6 @@
       return "";
     }
 
-    // -------------------------------------------------------------
-    // FUNZIONE CASUALE CRITTOGRAFICAMENTE SICURA
-    // -------------------------------------------------------------
     function getRandomDiceRoll() {
       const array = new Uint32Array(1);
       const limit = Math.floor(4294967296 / 6) * 6;
@@ -591,21 +588,11 @@
 
     let lastEventId = null;
 
-    // 10 COLORI BRILLANTI E BEN DISTINTI PER FINO A 10 GIOCATORI
     const PLAYER_COLORS = [
-      '#fbbf24', // 1. Ambra / Giallo brillante
-      '#3b82f6', // 2. Blu vivo
-      '#10b981', // 3. Smeraldo / Verde brillante
-      '#a855f7', // 4. Viola brillante
-      '#f43f5e', // 5. Rosa / Lampone brillante
-      '#06b6d4', // 6. Turchese / Ciano
-      '#f97316', // 7. Arancione intenso
-      '#84cc16', // 8. Lime chiaro
-      '#ec4899', // 9. Rosa fucsia
-      '#6366f1'  // 10. Indaco brillante
+      '#fbbf24', '#3b82f6', '#10b981', '#a855f7', '#f43f5e',
+      '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#6366f1'
     ];
 
-    // Fallback aptico iOS
     let _hapticLabel = null;
     let _lastIosTick = 0;
     function iosTick() {
@@ -757,8 +744,8 @@
       playerIds: {},   
       playerNames: {},
       scores: {},
-      records: {},          // Record scalato (puro, da 5 dadi)
-      inheritedRecords: {}, // Record con eredità (totale turno)
+      records: {},
+      inheritedRecords: {},
       hasEntered: {},
       zongCounts: {},
       totalRolls: {},
@@ -942,7 +929,6 @@
     const leaderboardContainer = document.getElementById('leaderboardContainer');
     const leaderboardTargetLabel = document.getElementById('leaderboardTargetLabel');
     
-    // Modale Record & Doppia Classifica
     const btnRecordsModal = document.getElementById('btnRecordsModal');
     const recordsModal = document.getElementById('recordsModal');
     const btnCloseRecords = document.getElementById('btnCloseRecords');
@@ -985,7 +971,6 @@
     const btnCancelTargetScore = document.getElementById('btnCancelTargetScore');
     const btnSaveTargetScore = document.getElementById('btnSaveTargetScore');
 
-    // Elementi Chat
     const chatLogContainer = document.getElementById('chatLogContainer');
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
@@ -1079,16 +1064,6 @@
         p.innerHTML = item.text;
         logContainer.appendChild(p);
       });
-    }
-
-    function appendChatMessage(sender, text, isSelf = false) {
-      if (!chatLogContainer) return;
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `text-xs leading-tight font-sans ${isSelf ? 'text-blue-300' : 'text-zinc-200'}`;
-      const time = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-      msgDiv.innerHTML = `<span class="text-[10px] text-zinc-500 mr-1">[${time}]</span><strong class="font-semibold ${isSelf ? 'text-blue-400' : 'text-amber-400'}">${sender}:</strong> <span>${escapeHtml(text)}</span>`;
-      chatLogContainer.appendChild(msgDiv);
-      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
     }
 
     function renderChatHistory() {
@@ -1389,7 +1364,6 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Classifica generale punti stanza (con nome colorato)
     function renderLeaderboard() {
       if (!leaderboardContainer) return;
       if (leaderboardTargetLabel) {
@@ -1417,7 +1391,6 @@
       });
     }
 
-    // Doppia classifica record nel modale Record (con nomi colorati)
     function renderRecordsModals() {
       if (!scaledRecordsContainer || !inheritedRecordsContainer) return;
       
@@ -1861,7 +1834,7 @@
       await saveStateToCloud();
     }
 
-    async function joinRoomProcess(name, code, targetScoreFromInput) {
+    async function joinRoomProcess(name, code, targetScoreFromInput, isPageRefresh = false) {
       roomCode = code;
 
       try {
@@ -1898,25 +1871,36 @@
           
           let existingPlayerIndex = -1;
 
+          // Controlla se il giocatore è già presente tramite il suo IDunivoco o lo stesso nome nella sessione
           for (let i = 1; i <= GameState.numPlayers; i++) {
-            if (GameState.playerIds[i] === myPlayerId || GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
+            if (GameState.playerIds[i] === myPlayerId) {
               existingPlayerIndex = i;
               break;
             }
           }
 
-          if (existingPlayerIndex !== -1) {
-            const confirmReentry = confirm(`Il giocatore "${name}" risulta già registrato in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
-            if (confirmReentry) {
-              myPlayerId = GameState.playerIds[existingPlayerIndex];
-              GameState.playerNames[existingPlayerIndex] = name;
-              setCookie("zong_my_player_id", myPlayerId);
-              localStorage.setItem("zong_my_player_id", myPlayerId);
-              await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
-            } else {
-              return false;
+          if (existingPlayerIndex === -1 && !isPageRefresh) {
+            // Controlla omonimia se non è un refresh automatico
+            for (let i = 1; i <= GameState.numPlayers; i++) {
+              if (GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
+                existingPlayerIndex = i;
+                break;
+              }
             }
+          }
+
+          if (existingPlayerIndex !== -1) {
+            if (!isPageRefresh) {
+              const confirmReentry = confirm(`Il giocatore "${name}" risulta già registrato in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
+              if (!confirmReentry) return false;
+            }
+            myPlayerId = GameState.playerIds[existingPlayerIndex];
+            GameState.playerNames[existingPlayerIndex] = name;
+            setCookie("zong_my_player_id", myPlayerId);
+            localStorage.setItem("zong_my_player_id", myPlayerId);
+            await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
           } else {
+            // Aggiunge un nuovo giocatore
             GameState.numPlayers++;
             GameState.playerIds[GameState.numPlayers] = myPlayerId;
             GameState.playerNames[GameState.numPlayers] = name;
@@ -1993,7 +1977,7 @@
 
       triggerHaptic(25);
       const tScore = parseInt(inputTargetScore.value) || 10000;
-      await joinRoomProcess(name, code, tScore);
+      await joinRoomProcess(name, code, tScore, false);
     });
 
     if (btnLeaveRoom) {
@@ -2022,7 +2006,8 @@
       if (savedRoom) inputRoomCode.value = savedRoom;
 
       if (savedName && savedRoom) {
-        await joinRoomProcess(savedName, savedRoom);
+        // Rientro automatico pulito al refresh della pagina senza pop-up fastidiosi
+        await joinRoomProcess(savedName, savedRoom, 10000, true);
       }
 
       btnRoll.addEventListener('click', () => { if (isMyTurn()) triggerHaptic(20); sound.init(); rollDice(); });
