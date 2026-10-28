@@ -185,8 +185,10 @@
   <!-- MODALE SELEZIONE GIOCATORI NUOVA PARTITA -->
   <div id="newGameModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full text-center">
-       <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-      <h3 class="text-base font-bold text-red-400 font-display mb-1">Nuova Partita! Seleziona giocatori</h3>
+        <div class="flex items-center gap-2 mb-2 text-red-400">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        <h3 class="text-base font-bold text-red-300 font-display">Nuova Partita! Seleziona Giocatori</h3>
+      </div>
       <p class="text-xs text-zinc-400 mb-4">Scegli chi parteciperà alla nuova partita:</p>
       <div id="playerSelectList" class="space-y-2 text-left mb-4 max-h-48 overflow-y-auto"></div>
       
