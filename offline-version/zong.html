@@ -162,7 +162,7 @@
         <span id="targetScoreDisplay" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <!-- BOTTONE TRASFORMATO IN FINESTRA CLASSIFICA RECORD TURNO -->
+      <!-- BOTTONE CLASSIFICA RECORD TURNO -->
       <button id="btnRecordModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-orange-300 text-xs font-semibold flex items-center gap-1.5" title="Classifica Record di Turno">
         <i data-lucide="award" class="w-4 h-4 text-orange-400"></i>
         <span class="hidden sm:inline">Record</span>
@@ -178,13 +178,14 @@
         <span class="hidden sm:inline">Regole</span>
       </button>
 
-      <!-- TAB GIOCATORI: CICLA DA 1 A 10 GIOCATORI -->
-      <button id="btnPlayers" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-blue-300 text-xs font-semibold flex items-center gap-1">
+      <!-- TAB GIOCATORI: MODALE SELEZIONE / AGGIUNTA DINAMICA -->
+      <button id="btnPlayers" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-blue-300 text-xs font-semibold flex items-center gap-1" title="Seleziona / Aggiungi Giocatori">
         <i data-lucide="users" class="w-4 h-4"></i>
         <span id="btnPlayersText">1 Gioc.</span>
       </button>
 
-      <button id="btnNewGame" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-red-900/60 text-red-300 text-xs font-semibold flex items-center gap-1">
+      <!-- BOTTONE NUOVA PARTITA CON MODALE -->
+      <button id="btnNewGame" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-red-900/60 text-red-300 text-xs font-semibold flex items-center gap-1" title="Nuova Partita">
           <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
       </button>
     </div>
@@ -340,6 +341,51 @@
     ZONG • Creato da Tex Willa
   </footer>
 
+  <!-- MODAL GESTIONE GIOCATORI IN PARTITA (DINAMICA CON + PER AGGIUNGERNE) -->
+  <div id="playersModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
+        <div class="flex items-center gap-2 text-blue-400">
+          <i data-lucide="users" class="w-5 h-5"></i>
+          <h3 class="text-base font-bold text-white font-display">Seleziona Giocatori</h3>
+        </div>
+        <button id="btnAddPlayerFromModal" class="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 transition" title="Aggiungi nuovo giocatore">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p class="text-xs text-zinc-400 mb-3">Seleziona o aggiungi giocatori per la partita in corso senza azzerarla:</p>
+      
+      <div id="playersModalList" class="space-y-2 max-h-60 overflow-y-auto mb-4 pr-1">
+        <!-- Elenco dinamico giocatori attivi/inattivi -->
+      </div>
+
+      <div class="flex gap-2 pt-2 border-t border-zinc-800">
+        <button id="btnCancelPlayersModal" class="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs hover:bg-zinc-700 transition">Annulla</button>
+        <button id="btnConfirmPlayersModal" class="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-500 transition">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NUOVA PARTITA CON SELEZIONE E SHUFFLE GIOCATORI -->
+  <div id="newGameModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full shadow-2xl">
+      <div class="flex items-center gap-2 mb-2 text-red-400">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        <h3 class="text-base font-bold text-white font-display">Nuova Partita</h3>
+      </div>
+      <p class="text-xs text-zinc-400 mb-3">Seleziona i giocatori: l'ordine di turno verrà generato in modo casuale mantenendo nomi e record!</p>
+      
+      <div id="newGamePlayerList" class="space-y-2 max-h-56 overflow-y-auto mb-4 pr-1">
+        <!-- Elenco dinamico dei giocatori con checkbox -->
+      </div>
+
+      <div class="flex gap-2">
+        <button id="btnCancelNewGame" class="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs hover:bg-zinc-700 transition">Annulla</button>
+        <button id="btnConfirmNewGame" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-500 transition">Avvia Partita</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL IMPOSTA PUNTEGGIO MASSIMO -->
   <div id="targetScoreModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-xs w-full shadow-2xl">
@@ -349,7 +395,6 @@
       </div>
       <p class="text-xs text-zinc-400 mb-3">Scegli o inserisci il punteggio necessario per vincere la partita:</p>
       
-      <!-- Preset Buttons -->
       <div class="grid grid-cols-2 gap-2 mb-3">
         <button type="button" class="preset-score-btn py-1.5 px-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-xs font-bold text-amber-300" data-value="2500">2.500 pt</button>
         <button type="button" class="preset-score-btn py-1.5 px-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-xs font-bold text-amber-300" data-value="5000">5.000 pt</button>
@@ -393,15 +438,21 @@
     </div>
   </div>
 
-  <!-- WIN MODAL -->
+  <!-- WIN MODAL CON CLASSIFICA FINALE E NUMERO DI TURNI -->
   <div id="winModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-gradient-to-b from-amber-950 via-zinc-950 to-black border-2 border-amber-500 rounded-3xl p-6 max-w-xs w-full text-center glow-gold">
-      <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-400">
-        <i data-lucide="trophy" class="w-8 h-8"></i>
+    <div class="bg-gradient-to-b from-amber-950 via-zinc-950 to-black border-2 border-amber-500 rounded-3xl p-6 max-w-sm w-full text-center glow-gold flex flex-col max-h-[90vh]">
+      <div class="w-14 h-14 mx-auto mb-2 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-400 shrink-0">
+        <i data-lucide="trophy" class="w-7 h-7"></i>
       </div>
       <h2 class="text-2xl font-black text-amber-400 font-display" id="winnerTitle">VITTORIA!</h2>
-      <p class="text-xs text-zinc-300 my-2" id="winnerSubtitle">Vittoria!</p>
-      <button id="btnRestartWin" class="w-full py-3 rounded-xl bg-amber-500 text-zinc-950 font-bold text-sm mt-3">Nuova Partita</button>
+      <p class="text-xs text-zinc-300 my-1" id="winnerSubtitle">Vittoria!</p>
+
+      <div class="my-3 border-t border-b border-amber-500/30 py-3 overflow-y-auto max-h-48 text-left space-y-1.5 px-1">
+        <div class="text-[10px] font-bold text-amber-400/90 uppercase tracking-wider mb-2 text-center">Classifica Finale Partita</div>
+        <div id="winLeaderboardContainer" class="space-y-1.5"></div>
+      </div>
+
+      <button id="btnRestartWin" class="w-full py-3 rounded-xl bg-amber-500 text-zinc-950 font-bold text-sm mt-1 shrink-0">Nuova Partita</button>
     </div>
   </div>
 
@@ -436,28 +487,120 @@
     </div>
   </div>
 
-  <!-- RECORD TURNO MODAL (NUOVA FINESTRA CLASSIFICA RECORD) -->
+  <!-- RECORD TURNO MODAL (MOSTRA SOLO I GIOCATORI IN PARTITA) -->
   <div id="recordModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full shadow-2xl">
-      <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-2">
         <div class="flex items-center gap-2 text-amber-400">
           <i data-lucide="trophy" class="w-5 h-5"></i>
-          <h3 class="text-base font-bold text-white font-display">Classifica Record Turni</h3>
+          <h3 class="text-base font-bold text-white font-display">Classifiche Record</h3>
         </div>
         <button id="btnCloseRecordModal" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <p class="text-[11px] text-zinc-400 mb-3">I migliori punteggi realizzati in un singolo turno dai giocatori nella stanza.</p>
-      <div id="recordModalContainer" class="space-y-2 max-h-[50vh] overflow-y-auto mb-3"></div>
+
+      <div class="overflow-y-auto space-y-4 pr-1 my-2 flex-1">
+        <!-- SEZIONE 1: RECORD SCALATO -->
+        <div>
+          <div class="flex items-center gap-1.5 text-xs font-bold text-amber-400 mb-2 uppercase tracking-wider">
+            <i data-lucide="award" class="w-3.5 h-3.5"></i>
+            <span>Record Scalato (da 0 pt con 5 dadi)</span>
+          </div>
+          <div id="cleanRecordsContainer" class="space-y-1.5"></div>
+        </div>
+
+        <div class="border-t border-zinc-800 my-2"></div>
+
+        <!-- SEZIONE 2: RECORD CON EREDITÀ -->
+        <div>
+          <div class="flex items-center gap-1.5 text-xs font-bold text-purple-400 mb-2 uppercase tracking-wider">
+            <i data-lucide="handshake" class="w-3.5 h-3.5"></i>
+            <span>Record con Eredità</span>
+          </div>
+          <div id="inheritedRecordsContainer" class="space-y-1.5"></div>
+        </div>
+      </div>
       
       <!-- TASTO PER RESETTARE TUTTI I RECORD -->
-      <button id="btnResetRecords" class="w-full py-2.5 rounded-xl bg-red-950/80 border border-red-800/60 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-red-900/80 transition">
-        <i data-lucide="trash-2" class="w-4 h-4"></i>
+      <button id="btnResetRecords" class="w-full py-2 rounded-xl bg-red-950/80 border border-red-800/60 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-red-900/80 transition mt-2">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
         <span>Resetta Tutti i Record</span>
       </button>
     </div>
   </div>
 
   <script>
+    // --- FUNZIONI DI GESTIONE COOKIE PER IL SALVATAGGIO DELLA SESSIONE ---
+    function setCookie(name, value, days = 7) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      const expires = "expires=" + d.toUTCString();
+      document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Lax";
+    }
+
+    function getCookie(name) {
+      const cname = name + "=";
+      const decodedCookie = decodeURIComponent(document.cookie);
+      const ca = decodedCookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(cname) === 0) {
+          return c.substring(cname.length, c.length);
+        }
+      }
+      return "";
+    }
+
+    function saveSessionToCookie() {
+      try {
+        const dataToSave = {
+          numPlayers: GameState.numPlayers,
+          activePlayer: GameState.activePlayer,
+          playerNames: GameState.playerNames,
+          scores: GameState.scores,
+          hasEntered: GameState.hasEntered,
+          playerTurnRecords: GameState.playerTurnRecords,
+          playerInheritedRecords: GameState.playerInheritedRecords,
+          isCleanTurn: GameState.isCleanTurn,
+          round: GameState.round,
+          phase: GameState.phase,
+          dice: GameState.dice,
+          turnAccumulatedScore: GameState.turnAccumulatedScore,
+          inheritedScore: GameState.inheritedScore,
+          targetScore: TARGET_SCORE,
+          statusMessage: statusMessageEl ? statusMessageEl.textContent : ""
+        };
+        setCookie('zong_game_session', JSON.stringify(dataToSave), 7);
+      } catch(e) {}
+    }
+
+    function loadSessionFromCookie() {
+      try {
+        const savedDataStr = getCookie('zong_game_session');
+        if (savedDataStr) {
+          const data = JSON.parse(savedDataStr);
+          if (data && typeof data === 'object') {
+            if (data.numPlayers) GameState.numPlayers = data.numPlayers;
+            if (data.activePlayer) GameState.activePlayer = data.activePlayer;
+            if (data.playerNames) Object.assign(GameState.playerNames, data.playerNames);
+            if (data.scores) Object.assign(GameState.scores, data.scores);
+            if (data.hasEntered) Object.assign(GameState.hasEntered, data.hasEntered);
+            if (data.playerTurnRecords) Object.assign(GameState.playerTurnRecords, data.playerTurnRecords);
+            if (data.playerInheritedRecords) Object.assign(GameState.playerInheritedRecords, data.playerInheritedRecords);
+            if (data.isCleanTurn !== undefined) GameState.isCleanTurn = data.isCleanTurn;
+            if (data.round) GameState.round = data.round;
+            if (data.phase) GameState.phase = data.phase === 'rolling' ? 'ready' : data.phase;
+            if (data.dice) GameState.dice = data.dice;
+            if (data.turnAccumulatedScore !== undefined) GameState.turnAccumulatedScore = data.turnAccumulatedScore;
+            if (data.inheritedScore !== undefined) GameState.inheritedScore = data.inheritedScore;
+            if (data.targetScore) TARGET_SCORE = data.targetScore;
+            if (data.statusMessage && statusMessageEl) statusMessageEl.textContent = data.statusMessage;
+            return true;
+          }
+        }
+      } catch(e) {}
+      return false;
+    }
+
     // Generatore di casualità crittografica reale basato sulla Web Crypto API
     function getRandomDiceValue() {
       const randomArray = new Uint32Array(1);
@@ -616,8 +759,9 @@
       scores: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 },
       hasEntered: { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false },
       
-      // Record singolo turno pulito per ciascun giocatore
+      // Record di Turno Scalato e Record Ereditato
       playerTurnRecords: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 },
+      playerInheritedRecords: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 },
       isCleanTurn: true,
 
       round: 1,
@@ -635,12 +779,12 @@
     };
 
     const PLAYER_COLORS = [
-      '#b8860b', '#3b82f6', '#10b981', '#a855f7', '#8B4513',
+      '#eab308', '#3b82f6', '#10b981', '#a855f7', '#ec4899',
       '#f97316', '#06b6d4', '#14b8a6', '#6366f1', '#f87171'
     ];
 
     function getPlayerColor(id) {
-      return PLAYER_COLORS[id - 1];
+      return PLAYER_COLORS[(id - 1) % PLAYER_COLORS.length];
     }
 
     let editingPlayerId = 1;
@@ -768,14 +912,28 @@
     const leaderboardModal = document.getElementById('leaderboardModal');
     const leaderboardContainer = document.getElementById('leaderboardContainer');
     
-    // Riferimenti per la nuova Modale Classifica Record Turno
+    // Modale Gestione Giocatori in Partita
+    const playersModal = document.getElementById('playersModal');
+    const playersModalList = document.getElementById('playersModalList');
+    const btnAddPlayerFromModal = document.getElementById('btnAddPlayerFromModal');
+    const btnCancelPlayersModal = document.getElementById('btnCancelPlayersModal');
+    const btnConfirmPlayersModal = document.getElementById('btnConfirmPlayersModal');
+
+    // Modale Nuova Partita
+    const newGameModal = document.getElementById('newGameModal');
+    const newGamePlayerList = document.getElementById('newGamePlayerList');
+    const btnCancelNewGame = document.getElementById('btnCancelNewGame');
+    const btnConfirmNewGame = document.getElementById('btnConfirmNewGame');
+
+    // Modale Classifica Record Turno
     const btnRecordModal = document.getElementById('btnRecordModal');
     const recordModal = document.getElementById('recordModal');
     const btnCloseRecordModal = document.getElementById('btnCloseRecordModal');
-    const recordModalContainer = document.getElementById('recordModalContainer');
+    const cleanRecordsContainer = document.getElementById('cleanRecordsContainer');
+    const inheritedRecordsContainer = document.getElementById('inheritedRecordsContainer');
     const btnResetRecords = document.getElementById('btnResetRecords');
 
-    // Riferimenti per la Modale Target Score
+    // Modale Target Score
     const btnTargetScore = document.getElementById('btnTargetScore');
     const targetScoreDisplay = document.getElementById('targetScoreDisplay');
     const targetScoreModal = document.getElementById('targetScoreModal');
@@ -787,6 +945,7 @@
     const zongModal = document.getElementById('zongModal');
     const btnCloseZong = document.getElementById('btnCloseZong');
     const winModal = document.getElementById('winModal');
+    const winLeaderboardContainer = document.getElementById('winLeaderboardContainer');
     const btnRestartWin = document.getElementById('btnRestartWin');
     const btnPlayers = document.getElementById('btnPlayers');
     const btnPlayersText = document.getElementById('btnPlayersText');
@@ -821,6 +980,7 @@
         GameState.playerNames[editingPlayerId] = val;
         try { localStorage.setItem('zong_player_names', JSON.stringify(GameState.playerNames)); } catch(e) {}
         nameModal.classList.add('hidden');
+        saveSessionToCookie();
         updateUI();
       }
     }
@@ -844,6 +1004,7 @@
           logInitialText.textContent = `Pronti. Obiettivo ${TARGET_SCORE.toLocaleString('it-IT')} punti!`;
         }
         addLog(`🎯 Punteggio finale impostato a ${TARGET_SCORE.toLocaleString('it-IT')} pt`, true);
+        saveSessionToCookie();
         updateUI();
       }
     }
@@ -873,7 +1034,7 @@
           </div>
           <div class="flex items-baseline justify-between mt-1">
             <span class="text-lg sm:text-xl font-extrabold text-white font-display" id="scoreP${i}">0</span>
-            <span class="text-[9px] text-amber-400/90 font-semibold" id="recP${i}" title="Record Turno Singolo Pulito">🥇 0 pt</span>
+            <span class="text-[9px] font-semibold text-amber-400/90" id="recP${i}" title="Record Scalato">🏆 0 pt</span>
           </div>
           <div class="w-full bg-zinc-800 rounded-full h-1 mt-1 overflow-hidden">
             <div id="barP${i}" class="h-full rounded-full transition-all duration-300" style="width: 0%; background-color: ${playerColor}"></div>
@@ -895,7 +1056,7 @@
         if(!cardEl) continue;
         const playerColor = getPlayerColor(i);
 
-        let currentScore = GameState.scores[i];
+        let currentScore = GameState.scores[i] || 0;
         labelEl.innerHTML = (GameState.activePlayer === i ? '● ' : '') + getPlayerName(i);
         labelEl.className = "text-[10px] font-bold uppercase";
         labelEl.style.color = playerColor;
@@ -925,6 +1086,7 @@
       let forcedFreeCount = 0;
 
       GameState.dice.forEach((d, idx) => {
+        applyCubeRotation(cubeElements[idx], d.value);
         if (d.status === 'selected') {
           selectedIndices.push(idx);
           selectedValues.push(d.value);
@@ -980,7 +1142,6 @@
         entryOverlay.classList.add('flex');
         
         if (totalTurnPoints >= 500) {
-          // Soglia raggiunta: rimuovi lucchetto e rosso, mostra il punteggio raggiunto
           entryOverlay.className = "absolute inset-0 bg-emerald-950/85 backdrop-blur-[2px] flex items-center justify-center z-10 transition-all duration-300";
           entryOverlayContent.className = "flex items-center gap-2 text-emerald-300 font-bold text-xs sm:text-sm";
           if (entryOverlayIcon) {
@@ -988,7 +1149,6 @@
           }
           entryOverlayText.textContent = `Apertura raggiunta: ${totalTurnPoints}/500 pt`;
         } else {
-          // Sotto soglia: mantieni rosso, lucchetto e testo di richiesta
           entryOverlay.className = "absolute inset-0 bg-red-950/80 backdrop-blur-[2px] flex items-center justify-center z-10 transition-all duration-300";
           entryOverlayContent.className = "flex items-center gap-2 text-red-300 font-bold text-xs sm:text-sm";
           if (entryOverlayIcon) {
@@ -1079,22 +1239,24 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    // RENDER CLASSIFICA GENERALE PARTITA
     function renderLeaderboard() {
       if (!leaderboardContainer) return;
       leaderboardContainer.innerHTML = '';
       const list = [];
       for (let i = 1; i <= GameState.numPlayers; i++) {
-        list.push({ id: i, score: GameState.scores[i], isActive: GameState.activePlayer === i });
+        list.push({ id: i, score: GameState.scores[i] || 0, isActive: GameState.activePlayer === i });
       }
       list.sort((a, b) => b.score - a.score);
 
       list.forEach((p, idx) => {
         const row = document.createElement('div');
+        const color = getPlayerColor(p.id);
         row.className = `flex items-center justify-between p-2.5 rounded-xl border ${p.isActive ? 'bg-amber-500/10 border-amber-500/50' : 'bg-zinc-950 border-zinc-800'}`;
         row.innerHTML = `
           <div class="flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
-            <span class="text-xs font-bold ${p.isActive ? 'text-amber-400' : 'text-zinc-200'}">${getPlayerName(p.id)}</span>
+            <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold text-white">${idx + 1}</span>
+            <span class="text-xs font-bold" style="color: ${color}">${getPlayerName(p.id)}</span>
           </div>
           <span class="text-sm font-black text-white">${p.score} pt</span>
         `;
@@ -1102,30 +1264,57 @@
       });
     }
 
+    // RENDER RECORD MODAL CON SOLI GIOCATORI NELLA PARTITA
     function renderRecordModalList() {
-      if (!recordModalContainer) return;
-      recordModalContainer.innerHTML = '';
-      const list = [];
-      for (let i = 1; i <= GameState.numPlayers; i++) {
-        list.push({ id: i, record: GameState.playerTurnRecords[i] || 0 });
-      }
-      list.sort((a, b) => b.record - a.record);
+      if (!cleanRecordsContainer || !inheritedRecordsContainer) return;
+      cleanRecordsContainer.innerHTML = '';
+      inheritedRecordsContainer.innerHTML = '';
 
-      list.forEach((p, idx) => {
+      const activeMatchPlayersList = [];
+      for (let i = 1; i <= GameState.numPlayers; i++) {
+        activeMatchPlayersList.push({
+          id: i,
+          name: getPlayerName(i),
+          cleanRecord: GameState.playerTurnRecords[i] || 0,
+          inheritedRecord: GameState.playerInheritedRecords[i] || 0
+        });
+      }
+
+      // Ordina per Record Scalato
+      const cleanList = [...activeMatchPlayersList].sort((a, b) => b.cleanRecord - a.cleanRecord);
+      cleanList.forEach((p, idx) => {
+        const color = getPlayerColor(p.id);
         const row = document.createElement('div');
-        row.className = `flex items-center justify-between p-2.5 rounded-xl border bg-zinc-950 border-zinc-800`;
+        row.className = 'flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs';
         row.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold text-amber-400">${idx + 1}</span>
-            <span class="text-xs font-bold text-zinc-200">${getPlayerName(p.id)}</span>
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-4 h-4 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-bold">${idx + 1}</span>
+            <span class="font-bold truncate" style="color: ${color}">${p.name}</span>
           </div>
-          <span class="text-sm font-black text-amber-300">🏆 ${p.record} pt</span>
+          <span class="font-black text-amber-400 shrink-0">${p.cleanRecord} pt</span>
         `;
-        recordModalContainer.appendChild(row);
+        cleanRecordsContainer.appendChild(row);
+      });
+
+      // Ordina per Record con Eredità
+      const inheritedList = [...activeMatchPlayersList].sort((a, b) => b.inheritedRecord - a.inheritedRecord);
+      inheritedList.forEach((p, idx) => {
+        const color = getPlayerColor(p.id);
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs';
+        row.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[10px] font-bold">${idx + 1}</span>
+            <span class="font-bold truncate" style="color: ${color}">${p.name}</span>
+          </div>
+          <span class="font-black text-purple-300 shrink-0">${p.inheritedRecord} pt</span>
+        `;
+        inheritedRecordsContainer.appendChild(row);
       });
     }
 
     function applyCubeRotation(cubeEl, faceNumber) {
+      if (!cubeEl) return;
       const rot = faceRotations[faceNumber] || { x: 0, y: 0 };
       cubeEl.style.transform = `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
     }
@@ -1167,6 +1356,7 @@
       GameState.securedInSubTurn = false;
       sound.playDiceRoll();
       triggerHaptic(40);
+      saveSessionToCookie();
       updateUI();
 
       const indicesToRoll = [];
@@ -1207,6 +1397,7 @@
         } else {
           statusMessageEl.textContent = `Usciti: [ ${newlyRolledValues.join(', ')} ]`;
           addLog(`Lancio: [ ${newlyRolledValues.join('-')} ]`);
+          saveSessionToCookie();
           updateUI();
         }
       }, 700);
@@ -1218,6 +1409,7 @@
       GameState.turnAccumulatedScore = 0;
       GameState.isCleanTurn = false;
       addLog(`💥 ZONG! [ ${rolledValues.join('-')} ]`, false, true);
+      saveSessionToCookie();
       zongModal.classList.remove('hidden');
     }
 
@@ -1234,6 +1426,7 @@
       GameState.isCleanTurn = true;
       GameState.phase = 'ready';
       statusMessageEl.textContent = `Turno di ${getPlayerName(GameState.activePlayer)}`;
+      saveSessionToCookie();
       updateUI();
     }
 
@@ -1260,11 +1453,12 @@
         addLog(`🔓 ${getPlayerName(GameState.activePlayer)} ha aperto (500+ pt)!`, true);
       }
 
-      GameState.scores[GameState.activePlayer] += finalTurnTotal;
+      GameState.scores[GameState.activePlayer] = (GameState.scores[GameState.activePlayer] || 0) + finalTurnTotal;
       sound.playBank();
       triggerHaptic(60);
       addLog(`🏦 ${getPlayerName(GameState.activePlayer)} incassa ${finalTurnTotal} pt!`, true);
 
+      // Aggiornamento dei Record
       if (GameState.isCleanTurn) {
         const currentRecord = GameState.playerTurnRecords[GameState.activePlayer] || 0;
         if (finalTurnTotal > currentRecord) {
@@ -1272,11 +1466,21 @@
           try {
             localStorage.setItem('zong_player_turn_records', JSON.stringify(GameState.playerTurnRecords));
           } catch(e) {}
-          addLog(`🔥 NUOVO RECORD DI TURNO per ${getPlayerName(GameState.activePlayer)}: ${finalTurnTotal} pt!`, true);
+          addLog(`🔥 NUOVO RECORD SCALATO per ${getPlayerName(GameState.activePlayer)}: ${finalTurnTotal} pt!`, true);
+        }
+      } else {
+        const currentInhRecord = GameState.playerInheritedRecords[GameState.activePlayer] || 0;
+        if (finalTurnTotal > currentInhRecord) {
+          GameState.playerInheritedRecords[GameState.activePlayer] = finalTurnTotal;
+          try {
+            localStorage.setItem('zong_player_inherited_records', JSON.stringify(GameState.playerInheritedRecords));
+          } catch(e) {}
+          addLog(`🤝 NUOVO RECORD CON EREDITÀ per ${getPlayerName(GameState.activePlayer)}: ${finalTurnTotal} pt!`, true);
         }
       }
 
       if (GameState.scores[GameState.activePlayer] >= TARGET_SCORE) {
+        saveSessionToCookie();
         triggerVictory(GameState.activePlayer, GameState.scores[GameState.activePlayer]);
         return;
       }
@@ -1300,14 +1504,41 @@
 
       GameState.isCleanTurn = false;
       GameState.phase = 'inherit_choice';
+      saveSessionToCookie();
       updateUI();
     }
 
     function triggerVictory(player, finalScore) {
       sound.playVictory();
       triggerHaptic([100, 50, 100, 50, 200]);
+      const turnSuffix = GameState.round === 1 ? '1 turno' : `${GameState.round} turni`;
       document.getElementById('winnerTitle').textContent = `VITTORIA!`;
-      document.getElementById('winnerSubtitle').textContent = `${getPlayerName(player)} ha trionfato raggiungendo ${finalScore} punti in ${GameState.round} turni!`;
+      document.getElementById('winnerSubtitle').textContent = `${getPlayerName(player)} ha trionfato raggiungendo ${finalScore.toLocaleString('it-IT')} punti in ${turnSuffix}!`;
+      
+      if (winLeaderboardContainer) {
+        winLeaderboardContainer.innerHTML = '';
+        const sortedPlayers = [];
+        for (let i = 1; i <= GameState.numPlayers; i++) {
+          sortedPlayers.push({ id: i, score: GameState.scores[i] || 0 });
+        }
+        sortedPlayers.sort((a, b) => b.score - a.score);
+
+        sortedPlayers.forEach((p, idx) => {
+          const color = getPlayerColor(p.id);
+          const isWinner = p.id === player;
+          const row = document.createElement('div');
+          row.className = `flex items-center justify-between p-2 rounded-xl border ${isWinner ? 'bg-amber-500/20 border-amber-400 font-bold' : 'bg-zinc-950/80 border-zinc-800'}`;
+          row.innerHTML = `
+            <div class="flex items-center gap-2 truncate">
+              <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold ${isWinner ? 'bg-amber-400 text-zinc-950' : 'bg-zinc-800 text-zinc-300'}">${idx + 1}</span>
+              <span class="text-xs font-bold truncate" style="color: ${color}">${getPlayerName(p.id)}</span>
+            </div>
+            <span class="text-xs font-black ${isWinner ? 'text-amber-300' : 'text-zinc-200'} shrink-0">${p.score.toLocaleString('it-IT')} pt</span>
+          `;
+          winLeaderboardContainer.appendChild(row);
+        });
+      }
+
       winModal.classList.remove('hidden');
     }
 
@@ -1319,6 +1550,7 @@
       sound.playClick();
       triggerHaptic(20);
       d.status = d.status === 'free' ? 'selected' : 'free';
+      saveSessionToCookie();
       updateUI();
     }
 
@@ -1343,11 +1575,163 @@
         triggerHaptic(50);
         addLog(`✂️ ${getPlayerName(GameState.activePlayer)} unisce due 5 (+100 pt)`, true);
         GameState.dice.forEach(d => { if (d.status === 'selected') d.status = 'free'; });
+        saveSessionToCookie();
         updateUI();
       }
     }
 
-    function startNewGame() {
+    // MODALE GIOCATORI IN PARTITA (DINAMICA)
+    function openPlayersModal() {
+      renderPlayersModalList();
+      playersModal.classList.remove('hidden');
+    }
+
+    function renderPlayersModalList() {
+      if (!playersModalList) return;
+      playersModalList.innerHTML = '';
+      
+      const existingIds = Object.keys(GameState.playerNames).map(Number).sort((a,b)=>a-b);
+      
+      existingIds.forEach((i) => {
+        const pName = getPlayerName(i);
+        const color = getPlayerColor(i);
+        const isChecked = i <= GameState.numPlayers;
+
+        const row = document.createElement('label');
+        row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 cursor-pointer hover:border-zinc-700 transition';
+        row.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <input type="checkbox" value="${i}" ${isChecked ? 'checked' : ''} class="midgame-p-checkbox w-4 h-4 accent-blue-500 rounded cursor-pointer">
+            <span class="text-xs font-bold" style="color: ${color}">${pName}</span>
+          </div>
+          <span class="text-[10px] text-zinc-500 font-semibold">${GameState.scores[i] || 0} pt</span>
+        `;
+        playersModalList.appendChild(row);
+      });
+    }
+
+    function addPlayerFromModal() {
+      let currentMaxAvailable = 0;
+      Object.keys(GameState.playerNames).forEach(id => {
+        const num = parseInt(id, 10);
+        if (num > currentMaxAvailable) currentMaxAvailable = num;
+      });
+
+      if (currentMaxAvailable < 10) {
+        const nextId = currentMaxAvailable + 1;
+        GameState.playerNames[nextId] = `Giocatore ${nextId}`;
+        GameState.scores[nextId] = 0;
+        GameState.hasEntered[nextId] = false;
+        GameState.playerTurnRecords[nextId] = 0;
+        GameState.playerInheritedRecords[nextId] = 0;
+        
+        renderPlayersModalList();
+        triggerHaptic(20);
+      } else {
+        alert("Raggiunto il limite massimo di 10 giocatori.");
+      }
+    }
+
+    function confirmPlayersModalSelection() {
+      const checkboxes = document.querySelectorAll('.midgame-p-checkbox:checked');
+      const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value, 10));
+
+      if (selectedIds.length === 0) {
+        alert("Seleziona almeno un giocatore!");
+        return;
+      }
+
+      const newPlayerCount = selectedIds.length;
+      const newNames = {};
+      const newScores = {};
+      const newHasEntered = {};
+      const newTurnRecords = {};
+      const newInheritedRecords = {};
+
+      selectedIds.forEach((oldId, newIndex) => {
+        const id = newIndex + 1;
+        newNames[id] = getPlayerName(oldId);
+        newScores[id] = GameState.scores[oldId] || 0;
+        newHasEntered[id] = GameState.hasEntered[oldId] || false;
+        newTurnRecords[id] = GameState.playerTurnRecords[oldId] || 0;
+        newInheritedRecords[id] = GameState.playerInheritedRecords[oldId] || 0;
+      });
+
+      GameState.numPlayers = newPlayerCount;
+      GameState.playerNames = newNames;
+      GameState.scores = newScores;
+      GameState.hasEntered = newHasEntered;
+      GameState.playerTurnRecords = newTurnRecords;
+      GameState.playerInheritedRecords = newInheritedRecords;
+
+      if (GameState.activePlayer > GameState.numPlayers) {
+        GameState.activePlayer = 1;
+      }
+
+      playersModal.classList.add('hidden');
+      initScoreboard();
+      saveSessionToCookie();
+      updateUI();
+      addLog(`⚙️ Configurazione giocatori aggiornata (${GameState.numPlayers} in gioco).`, true);
+    }
+
+    // MODALE NUOVA PARTITA CON LISTA DINAMICA E SHUFFLE
+    function openNewGameModal() {
+      newGamePlayerList.innerHTML = '';
+      
+      const existingIds = Object.keys(GameState.playerNames).map(Number).sort((a,b)=>a-b);
+      existingIds.forEach((i) => {
+        const pName = getPlayerName(i);
+        const color = getPlayerColor(i);
+        const cleanRec = GameState.playerTurnRecords[i] || 0;
+        const inhRec = GameState.playerInheritedRecords[i] || 0;
+        const isChecked = i <= GameState.numPlayers; 
+
+        const row = document.createElement('label');
+        row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 cursor-pointer hover:border-zinc-700 transition';
+        row.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <input type="checkbox" value="${i}" ${isChecked ? 'checked' : ''} class="newgame-p-checkbox w-4 h-4 accent-red-500 rounded cursor-pointer">
+            <span class="text-xs font-bold" style="color: ${color}">${pName}</span>
+          </div>
+          <div class="text-[10px] text-zinc-400 flex flex-col items-end">
+            <span>🏆 ${cleanRec} pt</span>
+            <span>🤝 ${inhRec} pt</span>
+          </div>
+        `;
+        newGamePlayerList.appendChild(row);
+      });
+      newGameModal.classList.remove('hidden');
+    }
+
+    // NUOVA PARTITA CON MANTENIMENTO NOMI/RECORD E SHUFFLE CASUALE
+    function executeNewGameWithSelected(selectedIds) {
+      if (!selectedIds || selectedIds.length === 0) return;
+
+      // Algoritmo di Shuffle (Fisher-Yates) per rendere casuale l'ordine di turno
+      const shuffledIds = [...selectedIds];
+      for (let i = shuffledIds.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledIds[i], shuffledIds[j]] = [shuffledIds[j], shuffledIds[i]];
+      }
+
+      const newPlayerCount = shuffledIds.length;
+      const newNames = {};
+      const newTurnRecords = {};
+      const newInheritedRecords = {};
+
+      shuffledIds.forEach((oldId, newIndex) => {
+        const id = newIndex + 1;
+        newNames[id] = getPlayerName(oldId);
+        newTurnRecords[id] = GameState.playerTurnRecords[oldId] || 0;
+        newInheritedRecords[id] = GameState.playerInheritedRecords[oldId] || 0;
+      });
+
+      GameState.numPlayers = newPlayerCount;
+      GameState.playerNames = newNames;
+      GameState.playerTurnRecords = newTurnRecords;
+      GameState.playerInheritedRecords = newInheritedRecords;
+
       GameState.scores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 };
       GameState.hasEntered = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false };
       GameState.turnAccumulatedScore = 0;
@@ -1360,11 +1744,13 @@
         { value: 1, status: 'free' }, { value: 2, status: 'free' }, { value: 3, status: 'free' },
         { value: 4, status: 'free' }, { value: 5, status: 'free' },
       ];
+
       GameState.dice.forEach((d, i) => applyCubeRotation(cubeElements[i], d.value));
       logContainer.innerHTML = '';
-      addLog(`Nuova partita (${GameState.numPlayers} Giocatori). Obiettivo: ${TARGET_SCORE.toLocaleString('it-IT')} pt.`);
+      addLog(`🎲 Nuova partita avviata (${GameState.numPlayers} Giocatori). Ordine turni casuale! Obiettivo: ${TARGET_SCORE.toLocaleString('it-IT')} pt.`);
       statusMessageEl.textContent = 'Premi "Lancia Dadi"';
       initScoreboard();
+      saveSessionToCookie();
       updateUI();
     }
 
@@ -1372,13 +1758,17 @@
       try {
         const savedRecords = localStorage.getItem('zong_player_turn_records');
         if (savedRecords) Object.assign(GameState.playerTurnRecords, JSON.parse(savedRecords));
+        const savedInhRecords = localStorage.getItem('zong_player_inherited_records');
+        if (savedInhRecords) Object.assign(GameState.playerInheritedRecords, JSON.parse(savedInhRecords));
         const savedNames = localStorage.getItem('zong_player_names');
         if (savedNames) Object.assign(GameState.playerNames, JSON.parse(savedNames));
         const savedTargetScore = localStorage.getItem('zong_target_score');
         if (savedTargetScore) TARGET_SCORE = parseInt(savedTargetScore, 10) || 10000;
       } catch (e) {}
 
-      GameState.dice.forEach((d, i) => applyCubeRotation(cubeElements[i], d.value));
+      // Caricamento sessione attiva da cookie
+      const hasRestoredSession = loadSessionFromCookie();
+
       diceContainers.forEach((el, index) => el.addEventListener('click', () => onDiceClick(index)));
 
       btnRoll.addEventListener('click', () => { sound.init(); rollDice(); });
@@ -1403,12 +1793,49 @@
         rollDice();
       });
 
-      btnNewGame.addEventListener('click', () => { triggerHaptic(20); startNewGame(); });
-
+      // Tasto Giocatori apre modale dinamica per aggiungere/selezionare giocatori
       btnPlayers.addEventListener('click', () => {
         triggerHaptic(20);
-        GameState.numPlayers = GameState.numPlayers >= 10 ? 1 : GameState.numPlayers + 1;
-        startNewGame();
+        openPlayersModal();
+      });
+
+      btnAddPlayerFromModal.addEventListener('click', () => {
+        addPlayerFromModal();
+      });
+
+      btnCancelPlayersModal.addEventListener('click', () => {
+        triggerHaptic(20);
+        playersModal.classList.add('hidden');
+      });
+
+      btnConfirmPlayersModal.addEventListener('click', () => {
+        triggerHaptic(20);
+        confirmPlayersModalSelection();
+      });
+
+      // Tasto Nuova Partita: Abre Modale di selezione e shuffle
+      btnNewGame.addEventListener('click', () => {
+        triggerHaptic(20);
+        openNewGameModal();
+      });
+
+      btnCancelNewGame.addEventListener('click', () => {
+        triggerHaptic(20);
+        newGameModal.classList.add('hidden');
+      });
+
+      btnConfirmNewGame.addEventListener('click', () => {
+        triggerHaptic(20);
+        const checkboxes = document.querySelectorAll('.newgame-p-checkbox:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value, 10));
+        
+        if (selectedIds.length === 0) {
+          alert("Seleziona almeno un giocatore per iniziare la partita!");
+          return;
+        }
+
+        newGameModal.classList.add('hidden');
+        executeNewGameWithSelected(selectedIds);
       });
 
       // Gestione Target Score Modal
@@ -1433,19 +1860,22 @@
       btnLeaderboard.addEventListener('click', () => { triggerHaptic(20); leaderboardModal.classList.remove('hidden'); });
       btnCloseLeaderboard.addEventListener('click', () => { triggerHaptic(20); leaderboardModal.classList.add('hidden'); });
       
-      // Gestione Eventi Modale Record Turni e Pulsante Reset Record
+      // Modale Record Turni
       btnRecordModal.addEventListener('click', () => { triggerHaptic(20); recordModal.classList.remove('hidden'); });
       btnCloseRecordModal.addEventListener('click', () => { triggerHaptic(20); recordModal.classList.add('hidden'); });
       
       btnResetRecords.addEventListener('click', () => {
         triggerHaptic(30);
-        if (confirm("Vuoi davvero azzerare tutti i record dei singoli turni di tutti i giocatori?")) {
+        if (confirm("Vuoi davvero azzerare tutti i record (scalati ed ereditati) di tutti i giocatori?")) {
           GameState.playerTurnRecords = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 };
+          GameState.playerInheritedRecords = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 };
           try {
             localStorage.removeItem('zong_player_turn_records');
+            localStorage.removeItem('zong_player_inherited_records');
           } catch(e) {}
+          saveSessionToCookie();
           updateUI();
-          addLog("🧹 Tutti i record dei turni sono stati resettati.", true);
+          addLog("🧹 Tutti i record sono stati resettati.", true);
         }
       });
 
@@ -1453,7 +1883,11 @@
       btnCloseRules.addEventListener('click', () => { triggerHaptic(20); rulesModal.classList.add('hidden'); });
       btnGotItRules.addEventListener('click', () => { triggerHaptic(20); rulesModal.classList.add('hidden'); });
       btnCloseZong.addEventListener('click', () => { triggerHaptic(20); zongModal.classList.add('hidden'); endTurn(); });
-      btnRestartWin.addEventListener('click', () => { triggerHaptic(20); winModal.classList.add('hidden'); startNewGame(); });
+      btnRestartWin.addEventListener('click', () => { 
+        triggerHaptic(20); 
+        winModal.classList.add('hidden'); 
+        openNewGameModal(); 
+      });
 
       btnSound.addEventListener('click', () => {
         triggerHaptic(20);
@@ -1466,6 +1900,9 @@
 
       initScoreboard();
       updateUI();
+      if (hasRestoredSession) {
+        addLog(`🔄 Sessione ripristinata dal cookie. Turno di ${getPlayerName(GameState.activePlayer)}.`, true);
+      }
     };
   </script>
 </body>
