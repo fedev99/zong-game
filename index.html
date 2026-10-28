@@ -1860,7 +1860,7 @@
       await saveStateToCloud();
     }
 
-    // GESTIONE ACCESSO E RIENTRO: Refresh di pagina senza prompt, prompt solo se usciti volontariamente
+    // GESTIONE ACCESSO E RIENTRO CON MESSAGGIO DI CONFERMA PERSONALIZZATO
     async function joinRoomProcess(name, code, targetScoreFromInput, isPageReload = false) {
       roomCode = code;
 
@@ -1916,8 +1916,8 @@
               localStorage.setItem("zong_my_player_id", myPlayerId);
               await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
             } else {
-              // Chiedi conferma solo se l'utente era uscito esplicitamente e rientra con lo stesso nome
-              const confirmReentry = confirm(`Il giocatore "${name}" risulta già registrato in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
+              // Mostra il messaggio richiesto: chiede se si vuole entrare con lo stesso punteggio
+              const confirmReentry = confirm(`Il giocatore "${name}" è già presente nella stanza. Vuoi entrare in quella stanza con lo stesso punteggio?`);
               if (confirmReentry) {
                 myPlayerId = GameState.playerIds[existingPlayerIndex];
                 GameState.playerNames[existingPlayerIndex] = name;
@@ -1925,7 +1925,7 @@
                 localStorage.setItem("zong_my_player_id", myPlayerId);
                 await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
               } else {
-                return false;
+                return false; // Se clicca annulla, riporta all'inserimento del nome e della stanza
               }
             }
           } else {
