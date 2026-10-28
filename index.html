@@ -188,10 +188,19 @@
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full text-center">
       <h3 class="text-base font-bold text-white font-display mb-1">Seleziona Giocatori</h3>
       <p class="text-xs text-zinc-400 mb-4">Scegli chi parteciperà alla nuova partita (l'ordine di gioco verrà estratto a caso):</p>
-      <div id="playerSelectList" class="space-y-2 text-left mb-5 max-h-48 overflow-y-auto"></div>
-      <div class="flex gap-2">
+      <div id="playerSelectList" class="space-y-2 text-left mb-4 max-h-48 overflow-y-auto"></div>
+      
+      <div class="flex gap-2 mb-3">
         <button id="btnCancelNewGame" class="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Annulla</button>
         <button id="btnConfirmNewGame" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs">Avvia</button>
+      </div>
+
+      <!-- AGGIUNTA BOTTONE PER USCIRE DALLA STANZA -->
+      <div class="border-t border-zinc-800 pt-3">
+        <button id="btnLeaveRoom" class="w-full py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-800/80 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          <span>Esci dalla Stanza</span>
+        </button>
       </div>
     </div>
   </div>
@@ -412,7 +421,7 @@
       </div>
     </div>
 
-    <!-- Modifica 1: Chat di Gruppo Stanza -->
+    <!-- Chat di Gruppo Stanza -->
     <div class="rounded-xl bg-zinc-900/70 border border-zinc-800 p-3 flex flex-col gap-2">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
@@ -503,13 +512,17 @@
 
   <script>
     // -------------------------------------------------------------
-    // GESTIONE COOKIE & PERSISTENZA UTENTE (Modifica 2)
+    // GESTIONE COOKIE & PERSISTENZA UTENTE
     // -------------------------------------------------------------
     function setCookie(name, value, days = 30) {
       const d = new Date();
       d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
       const expires = "expires=" + d.toUTCString();
       document.cookie = `${name}=${encodeURIComponent(value)};${expires};path=/;SameSite=Lax`;
+    }
+
+    function eraseCookie(name) {
+      document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
     }
 
     function getCookie(name) {
@@ -912,6 +925,7 @@
     const playerSelectList = document.getElementById('playerSelectList');
     const btnCancelNewGame = document.getElementById('btnCancelNewGame');
     const btnConfirmNewGame = document.getElementById('btnConfirmNewGame');
+    const btnLeaveRoom = document.getElementById('btnLeaveRoom');
 
     const btnTargetScoreHeader = document.getElementById('btnTargetScoreHeader');
     const btnTargetScoreMobile = document.getElementById('btnTargetScoreMobile');
@@ -1017,7 +1031,7 @@
     }
 
     // -------------------------------------------------------------
-    // MODIFICA 1: GESTIONE CHAT DI GRUPPO
+    // GESTIONE CHAT DI GRUPPO
     // -------------------------------------------------------------
     function appendChatMessage(sender, text, isSelf = false) {
       if (!chatLogContainer) return;
@@ -1677,9 +1691,7 @@
       }
     }
 
-    // -------------------------------------------------------------
-    // MODIFICA 3: ESTRAZIONE CASUALE ORDINE GIOCATORI A OGNI NUOVA PARTITA
-    // -------------------------------------------------------------
+    // ESTRAZIONE CASUALE ORDINE GIOCATORI A OGNI NUOVA PARTITA
     async function startNewGame(selectedPlayerIndices) {
       triggerHaptic(30);
       
@@ -1856,13 +1868,32 @@
       await joinRoomProcess(name, code, tScore);
     });
 
+    // AZIONE PER USCIRE DALLA STANZA CORRENTE
+    if (btnLeaveRoom) {
+      btnLeaveRoom.addEventListener('click', () => {
+        triggerHaptic(20);
+        eraseCookie("zong_room_code");
+        localStorage.removeItem("zong_room_code");
+
+        if (roomChannel) {
+          supabaseClient.removeChannel(roomChannel);
+        }
+
+        roomCode = null;
+        newGameModal.classList.add('hidden');
+        roomBadge.textContent = "Stanza: --";
+        
+        // Reset dei valori e apertura modale login
+        if (inputRoomCode) inputRoomCode.value = '';
+        roomModal.classList.remove('hidden');
+      });
+    }
+
     window.onload = async function () {
       GameState.dice.forEach((d, i) => applyCubeRotation(cubeElements[i], d.value));
       diceContainers.forEach((el, index) => el.addEventListener('click', () => onDiceClick(index)));
 
-      // -------------------------------------------------------------
-      // MODIFICA 2: CONTROLLO COOKIE PER REINDIRIZZAMENTO AUTOMATICO SE GIÀ ENTRATO
-      // -------------------------------------------------------------
+      // CONTROLLO COOKIE PER REINDIRIZZAMENTO AUTOMATICO SE GIÀ ENTRATO
       const savedName = getCookie("zong_player_name") || localStorage.getItem("zong_player_name");
       const savedRoom = getCookie("zong_room_code") || localStorage.getItem("zong_room_code");
 
