@@ -1733,6 +1733,7 @@
       winModal.classList.remove('hidden');
     }
 
+    // CORREZIONE CRUCIALE: Selezione dadi sincronizzata istantaneamente con il Cloud per gli altri giocatori
     async function onDiceClick(index) {
       if (!isMyTurn() || GameState.phase !== 'rolled') return;
       const d = GameState.dice[index];
