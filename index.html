@@ -185,13 +185,14 @@
   <!-- MODALE SELEZIONE GIOCATORI NUOVA PARTITA -->
   <div id="newGameModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full text-center">
-      <h3 class="text-base font-bold text-red-300 font-display mb-1">Seleziona Giocatori</h3>
-      <p class="text-xs text-zinc-400 mb-4">Scegli chi parteciperà alla nuova partita (l'ordine di gioco verrà estratto a caso):</p>
+       <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+      <h3 class="text-base font-bold text-red-400 font-display mb-1">Nuova Partita! Seleziona giocatori</h3>
+      <p class="text-xs text-zinc-400 mb-4">Scegli chi parteciperà alla nuova partita:</p>
       <div id="playerSelectList" class="space-y-2 text-left mb-4 max-h-48 overflow-y-auto"></div>
       
       <div class="flex gap-2 mb-3">
         <button id="btnCancelNewGame" class="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Annulla</button>
-        <button id="btnConfirmNewGame" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs">Avvia</button>
+        <button id="btnConfirmNewGame" class="flex-1 py-2.5 rounded-xl bg-red-400 text-zinc-950 font-bold text-xs">Avvia</button>
       </div>
 
       <div class="border-t border-zinc-800 pt-3">
@@ -527,20 +528,28 @@
   </div>
 
   <!-- LEADERBOARD MODAL -->
+
+
+
+
+  <!--
 <div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-        <!-- Contenitore flessibile: affianca l'icona al blocco di testo -->
+         Contenitore flessibile: affianca l'icona al blocco di testo 
         <div class="flex items-center gap-2">
           <i data-lucide="trophy" class="w-5 h-5 text-emerald-300"></i>
           
-          <!-- Blocco di testo: h3 e p uno sotto l'altro -->
+          -- Blocco di testo: h3 e p uno sotto l'altro 
           <div>
             <h3 class="text-base font-bold text-emerald-300 font-display">Classifica Punti Partita</h3>
             <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
           </div>
         </div>
 
+
+
+      -->
         <button id="btnCloseLeaderboard"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div id="leaderboardContainer" class="space-y-2"></div>
