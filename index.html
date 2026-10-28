@@ -245,12 +245,12 @@
         </div>
 
         <div class="border-t border-zinc-800 pt-3">
-          <span class="text-[10px] font-bold text-orange-400 uppercase tracking-wider block mb-1">🤝 Record con Eredità (Totale Turno)</span>
+          <span class="text-[10px] font-bold text-orange-600 uppercase tracking-wider block mb-1">🤝 Record con Eredità (Totale Turno)</span>
           <div id="inheritedRecordsContainer" class="space-y-1.5"></div>
         </div>
       </div>
       
-      <button id="btnGotItRecords" class="w-full py-2.5 rounded-xl bg-orange-600 text-zinc-950 font-bold text-xs mt-3">Chiudi</button>
+      <button id="btnGotItRecords" class="w-full py-2.5 rounded-xl bg-orange-400 text-zinc-950 font-bold text-xs mt-3">Chiudi</button>
     </div>
   </div>
 
@@ -506,7 +506,7 @@
   <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-md w-full max-h-[80vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-         <i data-lucide="trophy" class="w-5 h-5 text-purple-300"></i>
+         <i data-lucide="book-open" class="w-5 h-5 text-purple-300"></i>
         <h3 class="text-base font-bold text-purple-300 font-display">Regole ZONG (5 Dadi)</h3>
         <button id="btnCloseRules" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
@@ -519,7 +519,7 @@
         <p>• <strong>✨ Sei Magico:</strong> Se resta 1 solo dado ed esce 6, non perdi con Zong! Guadagni 0 pt ma sblocchi l'Hot Dice rilanciando tutti i 5 dadi.</p>
         <p>• <strong>✂️ Due Cinque:</strong> Uniscili per accantonare solo un 5 guadagnando 100 pt e tenendo l'altro libero per il tiro successivo.</p>
       </div>
-      <button id="btnGotItRules" class="w-full py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs mt-2">Chiudi</button>
+      <button id="btnGotItRules" class="w-full py-2.5 rounded-xl bg-purple-300 text-zinc-950 font-bold text-xs mt-2">Chiudi</button>
     </div>
   </div>
 
@@ -527,7 +527,7 @@
   <div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-        <div>
+        <div class="flex items-center gap-2 text-esmerald-300">
           <i data-lucide="trophy" class="w-5 h-5 text-esmerald-300"></i>
           <h3 class="text-base font-bold text-esmerald-300 font-display">Classifica Punti Partita</h3>
           <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
