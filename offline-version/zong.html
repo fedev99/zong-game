@@ -347,7 +347,7 @@
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
         <div class="flex items-center gap-2 text-blue-400">
           <i data-lucide="users" class="w-5 h-5"></i>
-          <h3 class="text-base font-bold text-white font-display">Seleziona Giocatori</h3>
+          <h3 class="text-base font-bold text-blue-300 font-display">Seleziona Giocatori</h3>
         </div>
         <button id="btnAddPlayerFromModal" class="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 transition" title="Aggiungi nuovo giocatore">
           <i data-lucide="plus" class="w-4 h-4"></i>
@@ -371,7 +371,7 @@
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full shadow-2xl">
       <div class="flex items-center gap-2 mb-2 text-red-400">
         <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-        <h3 class="text-base font-bold text-white font-display">Nuova Partita</h3>
+        <h3 class="text-base font-bold text-red-300 font-display">Nuova Partita</h3>
       </div>
       <p class="text-xs text-zinc-400 mb-3">Seleziona i giocatori: l'ordine di turno verrà generato in modo casuale mantenendo nomi e record!</p>
       
@@ -391,7 +391,7 @@
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-xs w-full shadow-2xl">
       <div class="flex items-center gap-2 mb-2 text-amber-400">
         <i data-lucide="target" class="w-5 h-5"></i>
-        <h3 class="text-base font-bold text-white font-display">Punteggio Massimo</h3>
+        <h3 class="text-base font-bold text-amber-400 font-display">Punteggio Massimo</h3>
       </div>
       <p class="text-xs text-zinc-400 mb-3">Scegli o inserisci il punteggio necessario per vincere la partita:</p>
       
@@ -460,7 +460,11 @@
   <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-md w-full max-h-[80vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-        <h3 class="text-base font-bold text-white font-display">Regole ZONG (5 Dadi)</h3>
+        <!-- Contenitore flex con gap-2 per staccare l'icona dal testo -->
+        <div class="flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5 text-purple-300"></i>
+          <h3 class="text-base font-bold text-purple-300 font-display">Regole ZONG (5 Dadi)</h3>
+        </div>
         <button id="btnCloseRules" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="overflow-y-auto space-y-3 py-3 text-xs text-zinc-300">
@@ -472,7 +476,7 @@
         <p>• <strong>✨ Sei Magico:</strong> Se resta 1 solo dado ed esce 6, non perdi con Zong! Guadagni 0 pt ma sblocchi l'Hot Dice rilanciando tutti i 5 dadi.</p>
         <p>• <strong>✂️ Due Cinque:</strong> Uniscili per accantonare solo un 5 guadagnando 100 pt e tenendo l'altro libero per il tiro successivo.</p>
       </div>
-      <button id="btnGotItRules" class="w-full py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs mt-2">Chiudi</button>
+      <button id="btnGotItRules" class="w-full py-2.5 rounded-xl bg-purple-300 text-zinc-950 font-bold text-xs mt-2">Chiudi</button>
     </div>
   </div>
 
@@ -480,7 +484,13 @@
   <div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-        <h3 class="text-base font-bold text-white font-display">Classifica</h3>
+        
+        <!-- Gruppo icona + titolo affiancati -->
+        <div class="flex items-center gap-2">
+          <i data-lucide="trophy" class="w-5 h-5 text-emerald-300"></i>
+          <h3 class="text-base font-bold text-emerald-300 font-display">Classifica Punti Partita</h3>
+        </div>
+
         <button id="btnCloseLeaderboard"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div id="leaderboardContainer" class="space-y-2"></div>
@@ -491,9 +501,9 @@
   <div id="recordModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full shadow-2xl flex flex-col max-h-[85vh]">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-2">
-        <div class="flex items-center gap-2 text-amber-400">
-          <i data-lucide="trophy" class="w-5 h-5"></i>
-          <h3 class="text-base font-bold text-white font-display">Classifiche Record</h3>
+        <div class="flex items-center gap-2 text-orange-400">
+          <i data-lucide="award" class="w-5 h-5"></i>
+          <h3 class="text-base font-bold text-orange-400 font-display">Classifica dei Record</h3>
         </div>
         <button id="btnCloseRecordModal" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
@@ -501,7 +511,7 @@
       <div class="overflow-y-auto space-y-4 pr-1 my-2 flex-1">
         <!-- SEZIONE 1: RECORD SCALATO -->
         <div>
-          <div class="flex items-center gap-1.5 text-xs font-bold text-amber-400 mb-2 uppercase tracking-wider">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-red-400 mb-2 uppercase tracking-wider">
             <i data-lucide="award" class="w-3.5 h-3.5"></i>
             <span>Record Scalato (da 0 pt con 5 dadi)</span>
           </div>
@@ -512,7 +522,7 @@
 
         <!-- SEZIONE 2: RECORD CON EREDITÀ -->
         <div>
-          <div class="flex items-center gap-1.5 text-xs font-bold text-purple-400 mb-2 uppercase tracking-wider">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-orange-400 mb-2 uppercase tracking-wider">
             <i data-lucide="handshake" class="w-3.5 h-3.5"></i>
             <span>Record con Eredità</span>
           </div>
@@ -1291,7 +1301,7 @@
             <span class="w-4 h-4 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-bold">${idx + 1}</span>
             <span class="font-bold truncate" style="color: ${color}">${p.name}</span>
           </div>
-          <span class="font-black text-amber-400 shrink-0">${p.cleanRecord} pt</span>
+          <span class="font-black text-red-400 shrink-0">${p.cleanRecord} pt</span>
         `;
         cleanRecordsContainer.appendChild(row);
       });
@@ -1307,7 +1317,7 @@
             <span class="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[10px] font-bold">${idx + 1}</span>
             <span class="font-bold truncate" style="color: ${color}">${p.name}</span>
           </div>
-          <span class="font-black text-purple-300 shrink-0">${p.inheritedRecord} pt</span>
+          <span class="font-black text-orange-300 shrink-0">${p.inheritedRecord} pt</span>
         `;
         inheritedRecordsContainer.appendChild(row);
       });
