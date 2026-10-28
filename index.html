@@ -148,7 +148,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between overflow-x-hidden p-2 sm:p-4">
 
-  <!-- POP-UP NOTIFICA NON INVASIVO -->
+  <!-- POP-UP NOTIFICA -->
   <div id="quickToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] hidden pointer-events-none">
     <div id="toastContent" class="px-4 py-2.5 rounded-2xl bg-zinc-900/95 border text-xs sm:text-sm font-bold shadow-2xl backdrop-blur-md flex items-center gap-2.5">
       <span id="toastIcon">🔥</span>
@@ -231,7 +231,7 @@
   <div id="recordsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-        <div class="flex items-center gap-2 text-amber-400">
+        <div class="flex items-center gap-2 text-pink-400">
           <i data-lucide="trophy" class="w-5 h-5"></i>
           <h3 class="text-base font-bold text-white font-display">Classifica Record</h3>
         </div>
@@ -239,20 +239,18 @@
       </div>
       
       <div class="overflow-y-auto space-y-4 py-1 pr-1 text-xs">
-        <!-- Sezione Record Scalato (Puro) -->
         <div>
-          <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-1">🔥 Record Scalato (Puro da 5 dadi)</span>
+          <span class="text-[10px] font-bold text-pink-400 uppercase tracking-wider block mb-1">🔥 Record Scalato (Puro da 5 dadi)</span>
           <div id="scaledRecordsContainer" class="space-y-1.5"></div>
         </div>
 
-        <!-- Sezione Record con Eredità (Totale) -->
         <div class="border-t border-zinc-800 pt-3">
-          <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">🤝 Record con Eredità (Totale Turno)</span>
+          <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">🤝 Record con Eredità (Totale Turno)</span>
           <div id="inheritedRecordsContainer" class="space-y-1.5"></div>
         </div>
       </div>
       
-      <button id="btnGotItRecords" class="w-full py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs mt-3">Chiudi</button>
+      <button id="btnGotItRecords" class="w-full py-2.5 rounded-xl bg-pink-600 text-white font-bold text-xs mt-3">Chiudi</button>
     </div>
   </div>
 
@@ -284,9 +282,9 @@
         <span id="targetScoreHeaderLabel" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <!-- BOTTONE RECORD (Trophy) -->
-      <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-300 text-xs font-semibold flex items-center gap-1">
-        <i data-lucide="trophy" class="w-4 h-4"></i>
+      <!-- BOTTONE RECORD CON NUOVO COLORE NELLA NAVBAR -->
+      <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-pink-600/20 border border-pink-500/50 text-pink-300 text-xs font-semibold flex items-center gap-1 hover:bg-pink-600/30 transition">
+        <i data-lucide="trophy" class="w-4 h-4 text-pink-400"></i>
         <span class="hidden sm:inline">Record</span>
       </button>
 
@@ -450,7 +448,7 @@
       </div>
     </div>
 
-    <!-- Chat di Gruppo Stanza (Sincronizzata e Persistente) -->
+    <!-- Chat di Gruppo Stanza -->
     <div class="rounded-xl bg-zinc-900/70 border border-zinc-800 p-3 flex flex-col gap-2">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
@@ -592,6 +590,20 @@
     localStorage.setItem("zong_my_player_id", myPlayerId);
 
     let lastEventId = null;
+
+    // 10 COLORI BRILLANTI E BEN DISTINTI PER FINO A 10 GIOCATORI
+    const PLAYER_COLORS = [
+      '#fbbf24', // 1. Ambra / Giallo brillante
+      '#3b82f6', // 2. Blu vivo
+      '#10b981', // 3. Smeraldo / Verde brillante
+      '#a855f7', // 4. Viola brillante
+      '#f43f5e', // 5. Rosa / Lampone brillante
+      '#06b6d4', // 6. Turchese / Ciano
+      '#f97316', // 7. Arancione intenso
+      '#84cc16', // 8. Lime chiaro
+      '#ec4899', // 9. Rosa fucsia
+      '#6366f1'  // 10. Indaco brillante
+    ];
 
     // Fallback aptico iOS
     let _hapticLabel = null;
@@ -764,7 +776,7 @@
       inheritedScore: 0,       
       securedInSubTurn: false,
       logs: [],
-      chatLogs: [], // Cronologia chat salvata nella stanza
+      chatLogs: [],
       lastEvent: null
     };
 
@@ -1038,9 +1050,10 @@
       playerSelectList.innerHTML = '';
       for (let i = 1; i <= GameState.numPlayers; i++) {
         const pName = getPlayerName(i);
+        const playerColor = PLAYER_COLORS[(i - 1) % PLAYER_COLORS.length];
         const label = document.createElement('label');
-        label.className = 'flex items-center gap-2 p-2 bg-zinc-950 rounded-xl cursor-pointer border border-zinc-800 text-xs text-zinc-200 font-semibold';
-        label.innerHTML = `<input type="checkbox" data-player-index="${i}" checked class="w-4 h-4 accent-amber-500 rounded"> <span>${pName}</span>`;
+        label.className = 'flex items-center gap-2 p-2 bg-zinc-950 rounded-xl cursor-pointer border border-zinc-800 text-xs font-semibold';
+        label.innerHTML = `<input type="checkbox" data-player-index="${i}" checked class="w-4 h-4 accent-amber-500 rounded"> <span style="color: ${playerColor}">${pName}</span>`;
         playerSelectList.appendChild(label);
       }
       newGameModal.classList.remove('hidden');
@@ -1068,9 +1081,6 @@
       });
     }
 
-    // -------------------------------------------------------------
-    // GESTIONE CHAT DI GRUPPO PERSISTENTE SULLA STANZA
-    // -------------------------------------------------------------
     function appendChatMessage(sender, text, isSelf = false) {
       if (!chatLogContainer) return;
       const msgDiv = document.createElement('div');
@@ -1120,8 +1130,6 @@
         await saveStateToCloud();
       });
     }
-
-    const PLAYER_COLORS = ['#fbbf24', '#3b82f6', '#10b981', '#a855f7', '#f43f5e'];
 
     function initScoreboard() {
       if(!playersContainer) return;
@@ -1381,6 +1389,7 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    // Classifica generale punti stanza (con nome colorato)
     function renderLeaderboard() {
       if (!leaderboardContainer) return;
       if (leaderboardTargetLabel) {
@@ -1394,12 +1403,13 @@
       list.sort((a, b) => b.score - a.score);
 
       list.forEach((p, idx) => {
+        const playerColor = PLAYER_COLORS[(p.id - 1) % PLAYER_COLORS.length];
         const row = document.createElement('div');
         row.className = `flex items-center justify-between p-2.5 rounded-xl border ${p.isActive ? 'bg-amber-500/10 border-amber-500/50' : 'bg-zinc-950 border-zinc-800'}`;
         row.innerHTML = `
           <div class="flex items-center gap-2">
             <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
-            <span class="text-xs font-bold ${p.isActive ? 'text-amber-400' : 'text-zinc-200'}">${getPlayerName(p.id)}</span>
+            <span class="text-xs font-bold" style="color: ${playerColor}">${getPlayerName(p.id)}</span>
           </div>
           <span class="text-sm font-black text-white">${p.score} pt</span>
         `;
@@ -1407,7 +1417,7 @@
       });
     }
 
-    // Rendering della doppia classifica record nel modale Record
+    // Doppia classifica record nel modale Record (con nomi colorati)
     function renderRecordsModals() {
       if (!scaledRecordsContainer || !inheritedRecordsContainer) return;
       
@@ -1428,30 +1438,30 @@
       scaledList.sort((a, b) => b.score - a.score);
       inheritedList.sort((a, b) => b.score - a.score);
 
-      // Popola Record Scalato (Puro)
       scaledList.forEach((p, idx) => {
+        const playerColor = PLAYER_COLORS[(p.id - 1) % PLAYER_COLORS.length];
         const row = document.createElement('div');
         row.className = "flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800";
         row.innerHTML = `
           <div class="flex items-center gap-2">
             <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
-            <span class="text-xs font-bold text-zinc-200">${getPlayerName(p.id)}</span>
+            <span class="text-xs font-bold" style="color: ${playerColor}">${getPlayerName(p.id)}</span>
           </div>
-          <span class="text-xs font-black text-amber-300">${p.score} pt</span>
+          <span class="text-xs font-black text-pink-300">${p.score} pt</span>
         `;
         scaledRecordsContainer.appendChild(row);
       });
 
-      // Popola Record con Eredità (Totale)
       inheritedList.forEach((p, idx) => {
+        const playerColor = PLAYER_COLORS[(p.id - 1) % PLAYER_COLORS.length];
         const row = document.createElement('div');
         row.className = "flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800";
         row.innerHTML = `
           <div class="flex items-center gap-2">
             <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
-            <span class="text-xs font-bold text-zinc-200">${getPlayerName(p.id)}</span>
+            <span class="text-xs font-bold" style="color: ${playerColor}">${getPlayerName(p.id)}</span>
           </div>
-          <span class="text-xs font-black text-blue-300">${p.score} pt</span>
+          <span class="text-xs font-black text-cyan-300">${p.score} pt</span>
         `;
         inheritedRecordsContainer.appendChild(row);
       });
@@ -1647,20 +1657,17 @@
         addLog(`🔓 ${getPlayerName(GameState.activePlayer)} ha aperto (500+ pt)!`, true);
       }
 
-      // Aggiornamento dei record differenziati
       if (!GameState.records) GameState.records = {};
       if (!GameState.inheritedRecords) GameState.inheritedRecords = {};
 
       const currentScaledRecord = GameState.records[GameState.activePlayer] || 0;
       const currentInheritedRecord = GameState.inheritedRecords[GameState.activePlayer] || 0;
 
-      // 1. Record Scalato (puro, senza eredità)
       if (!GameState.isInheritedTurn && finalTurnTotal > currentScaledRecord) {
         GameState.records[GameState.activePlayer] = finalTurnTotal;
         addLog(`🏆 Nuovo Record Scalato per ${getPlayerName(GameState.activePlayer)}: ${finalTurnTotal} pt!`, true);
       }
 
-      // 2. Record con Eredità (totale turno)
       if (finalTurnTotal > currentInheritedRecord) {
         GameState.inheritedRecords[GameState.activePlayer] = finalTurnTotal;
       }
@@ -1741,13 +1748,14 @@
       if (winLeaderboardContainer) {
         winLeaderboardContainer.innerHTML = '';
         list.forEach((p, idx) => {
+          const playerColor = PLAYER_COLORS[(p.id - 1) % PLAYER_COLORS.length];
           const row = document.createElement('div');
           const isMe = GameState.playerIds[p.id] === myPlayerId;
           row.className = `flex items-center justify-between p-2 rounded-xl border ${isMe ? 'bg-amber-500/10 border-amber-500/50' : 'bg-zinc-950 border-zinc-800'}`;
           row.innerHTML = `
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
-              <span class="text-xs font-bold ${isMe ? 'text-amber-400' : 'text-zinc-200'}">${getPlayerName(p.id)} ${isMe ? '(Tu)' : ''}</span>
+              <span class="text-xs font-bold" style="color: ${playerColor}">${getPlayerName(p.id)} ${isMe ? '(Tu)' : ''}</span>
             </div>
             <span class="text-xs font-black text-white">${p.score} pt</span>
           `;
@@ -1796,7 +1804,6 @@
       }
     }
 
-    // ESTRAZIONE CASUALE ORDINE GIOCATORI A OGNI NUOVA PARTITA
     async function startNewGame(selectedPlayerIndices) {
       triggerHaptic(30);
       
@@ -1854,7 +1861,6 @@
       await saveStateToCloud();
     }
 
-    // GESTIONE ACCESSO E RIENTRO CORRETTO NELLA STANZA
     async function joinRoomProcess(name, code, targetScoreFromInput) {
       roomCode = code;
 
@@ -1867,7 +1873,6 @@
         }
 
         if (!data) {
-          // Creazione nuova stanza
           const tScore = targetScoreFromInput || 10000;
           GameState.targetScore = tScore;
           TARGET_SCORE = tScore;
@@ -1886,7 +1891,6 @@
           
           await supabaseClient.from('rooms').insert([{ code: roomCode, state: GameState }]);
         } else {
-          // Stanza esistente
           Object.assign(GameState, data.state);
           TARGET_SCORE = GameState.targetScore || 10000;
           if (!GameState.chatLogs) GameState.chatLogs = [];
@@ -1902,7 +1906,6 @@
           }
 
           if (existingPlayerIndex !== -1) {
-            // Giocatore già esistente: chiedi conferma di rientro
             const confirmReentry = confirm(`Il giocatore "${name}" risulta già registrato in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
             if (confirmReentry) {
               myPlayerId = GameState.playerIds[existingPlayerIndex];
@@ -1914,7 +1917,6 @@
               return false;
             }
           } else {
-            // Nuovo giocatore che si unisce
             GameState.numPlayers++;
             GameState.playerIds[GameState.numPlayers] = myPlayerId;
             GameState.playerNames[GameState.numPlayers] = name;
@@ -1932,7 +1934,6 @@
           }
         }
 
-        // Salvataggio credenziali stanza
         setCookie("zong_player_name", name);
         setCookie("zong_room_code", roomCode);
         localStorage.setItem("zong_player_name", name);
@@ -1941,7 +1942,6 @@
         roomModal.classList.add('hidden');
         roomBadge.textContent = `Stanza: ${roomCode}`;
 
-        // Sincronizzazione Realtime
         supabaseClient.channel('room-sync-' + roomCode)
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, payload => {
             if (payload.new && payload.new.state) {
@@ -2096,7 +2096,6 @@
       if (btnCancelTargetScore) btnCancelTargetScore.addEventListener('click', closeTargetScoreModal);
       if (btnSaveTargetScore) btnSaveTargetScore.addEventListener('click', saveTargetScoreFromModal);
 
-      // Gestione modale Record (Bottone Trophy)
       if (btnRecordsModal) btnRecordsModal.addEventListener('click', () => { triggerHaptic(20); renderRecordsModals(); recordsModal.classList.remove('hidden'); });
       if (btnCloseRecords) btnCloseRecords.addEventListener('click', () => { triggerHaptic(20); recordsModal.classList.add('hidden'); });
       if (btnGotItRecords) btnGotItRecords.addEventListener('click', () => { triggerHaptic(20); recordsModal.classList.add('hidden'); });
