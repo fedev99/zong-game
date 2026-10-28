@@ -195,6 +195,7 @@
         <button id="btnConfirmNewGame" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs">Avvia</button>
       </div>
 
+      <!-- BOTTONE PER USCIRE DALLA STANZA -->
       <div class="border-t border-zinc-800 pt-3">
         <button id="btnLeaveRoom" class="w-full py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-800/80 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5 transition">
           <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
@@ -553,7 +554,7 @@
     // CONFIGURAZIONE SUPABASE PER LA SALA ONLINE
     // -------------------------------------------------------------
     const SUPABASE_URL = 'https://ttajaifqzjpdfxvrvdnf.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0YWphaWZxempwZGZ4dnJ2ZG5mIiwicm9sZSI6InRub24iLCJpYXQiOjE3OTIxNzk1MjAsImV4cCI6MjEwNzc1NTUyMH0.VOd9PManWdsbykk7MLpvgBlrXAKmTxTOQqUV63Q1_J4';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0YWphaWZxempwZGZ4dnJ2ZG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNzk1MjAsImV4cCI6MjEwNzc1NTUyMH0.VOd9PManWdsbykk7MLpvgBlrXAKmTxTOQqUV63Q1_J4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let roomCode = null;
@@ -1694,6 +1695,7 @@
     async function startNewGame(selectedPlayerIndices) {
       triggerHaptic(30);
       
+      // Shuffle casuale degli indici selezionati (Fisher-Yates)
       const shuffledIndices = [...selectedPlayerIndices];
       for (let i = shuffledIndices.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -1745,14 +1747,20 @@
       await saveStateToCloud();
     }
 
-    // GESTIONE ACCESSO STANZA ONLINE CON GESTIONE NOME ESISTENTE
-    async function joinRoomProcess(name, code, targetScoreFromInput, isAutoReconnect = false) {
+    // GESTIONE ACCESSO STANZA ONLINE CON SALVATAGGIO COOKIE E CONTROLLO RIENTRO
+    async function joinRoomProcess(name, code, targetScoreFromInput) {
       roomCode = code;
 
       try {
         let { data, error } = await supabaseClient.from('rooms').select('*').eq('code', roomCode).maybeSingle();
 
+        if (error) {
+          alert("Errore di connessione a Supabase.");
+          return false;
+        }
+
         if (!data) {
+          // Stanza nuova
           const tScore = targetScoreFromInput || 10000;
           GameState.targetScore = tScore;
           TARGET_SCORE = tScore;
@@ -1769,55 +1777,54 @@
           
           await supabaseClient.from('rooms').insert([{ code: roomCode, state: GameState }]);
         } else {
+          // Stanza esistente
           Object.assign(GameState, data.state);
           TARGET_SCORE = GameState.targetScore || 10000;
           
-          let alreadyIn = false;
-          let matchedPlayerIndex = -1;
+          let existingPlayerIndex = -1;
+          let nameExists = false;
 
           for (let i = 1; i <= GameState.numPlayers; i++) {
             if (GameState.playerIds[i] === myPlayerId) {
-              alreadyIn = true;
-              GameState.playerNames[i] = name;
-              break;
+              existingPlayerIndex = i;
             } else if (GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
-              matchedPlayerIndex = i;
+              existingPlayerIndex = i; // Trovato un giocatore con lo stesso nome
+              nameExists = true;
             }
           }
 
-          if (!alreadyIn) {
-            if (matchedPlayerIndex !== -1) {
-              // Il nome esiste già nella stanza creata da altri/precedentemente
-              if (!isAutoReconnect) {
-                const vuoleRientrare = confirm(`Il nome "${name}" è già presente in questa stanza. Vuoi rientrare nella stanza con lo stesso nome e riprendere il tuo punteggio?`);
-                if (!vuoleRientrare) {
-                  // Se fa Annulla, puliamo la stanza e rimaniamo nella modale
-                  roomCode = null;
-                  return false;
-                }
-              }
-              // Riassegniamo il myPlayerId a quel giocatore esistente per riprendere lo stato
-              myPlayerId = GameState.playerIds[matchedPlayerIndex];
+          if (existingPlayerIndex !== -1) {
+            // Giocatore già presente nella stanza
+            const confirmReentry = confirm(`Il giocatore "${name}" è già presente in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
+            if (confirmReentry) {
+              // Riconnetti il giocatore mantenendo il suo ID e punteggio
+              myPlayerId = GameState.playerIds[existingPlayerIndex];
+              GameState.playerNames[existingPlayerIndex] = name;
               setCookie("zong_my_player_id", myPlayerId);
               localStorage.setItem("zong_my_player_id", myPlayerId);
-            } else {
-              GameState.numPlayers++;
-              GameState.playerIds[GameState.numPlayers] = myPlayerId;
-              GameState.playerNames[GameState.numPlayers] = name;
-              GameState.scores[GameState.numPlayers] = 0;
-              if (!GameState.records) GameState.records = {};
-              GameState.records[GameState.numPlayers] = 0;
-              GameState.hasEntered[GameState.numPlayers] = false;
-              if (!GameState.zongCounts) GameState.zongCounts = {};
-              GameState.zongCounts[GameState.numPlayers] = 0;
-              if (!GameState.totalRolls) GameState.totalRolls = {};
-              GameState.totalRolls[GameState.numPlayers] = 0;
               await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
+            } else {
+              // L'utente rifiuta: ritorna all'inserimento dati
+              return false;
             }
+          } else {
+            // Nuovo giocatore che si aggiunge alla stanza
+            GameState.numPlayers++;
+            GameState.playerIds[GameState.numPlayers] = myPlayerId;
+            GameState.playerNames[GameState.numPlayers] = name;
+            GameState.scores[GameState.numPlayers] = 0;
+            if (!GameState.records) GameState.records = {};
+            GameState.records[GameState.numPlayers] = 0;
+            GameState.hasEntered[GameState.numPlayers] = false;
+            if (!GameState.zongCounts) GameState.zongCounts = {};
+            GameState.zongCounts[GameState.numPlayers] = 0;
+            if (!GameState.totalRolls) GameState.totalRolls = {};
+            GameState.totalRolls[GameState.numPlayers] = 0;
+            await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
           }
         }
 
-        // Salvataggio definitivo nei cookie / localStorage se tutto va a buon fine
+        // Salvataggio nei cookie e localStorage dell'accesso riuscito
         setCookie("zong_player_name", name);
         setCookie("zong_room_code", roomCode);
         localStorage.setItem("zong_player_name", name);
@@ -1874,9 +1881,10 @@
 
       triggerHaptic(25);
       const tScore = parseInt(inputTargetScore.value) || 10000;
-      await joinRoomProcess(name, code, tScore, false);
+      await joinRoomProcess(name, code, tScore);
     });
 
+    // AZIONE PER USCIRE DALLA STANZA CORRENTE
     if (btnLeaveRoom) {
       btnLeaveRoom.addEventListener('click', () => {
         triggerHaptic(20);
@@ -1891,6 +1899,7 @@
         newGameModal.classList.add('hidden');
         roomBadge.textContent = "Stanza: --";
         
+        // Reset dei valori e apertura modale login
         if (inputRoomCode) inputRoomCode.value = '';
         roomModal.classList.remove('hidden');
       });
@@ -1900,6 +1909,7 @@
       GameState.dice.forEach((d, i) => applyCubeRotation(cubeElements[i], d.value));
       diceContainers.forEach((el, index) => el.addEventListener('click', () => onDiceClick(index)));
 
+      // CONTROLLO COOKIE PER REINDIRIZZAMENTO AUTOMATICO SE GIÀ ENTRATO
       const savedName = getCookie("zong_player_name") || localStorage.getItem("zong_player_name");
       const savedRoom = getCookie("zong_room_code") || localStorage.getItem("zong_room_code");
 
@@ -1907,7 +1917,7 @@
       if (savedRoom) inputRoomCode.value = savedRoom;
 
       if (savedName && savedRoom) {
-        await joinRoomProcess(savedName, savedRoom, 10000, true);
+        await joinRoomProcess(savedName, savedRoom);
       }
 
       btnRoll.addEventListener('click', () => { if (isMyTurn()) triggerHaptic(20); sound.init(); rollDice(); });
@@ -1965,6 +1975,7 @@
         startNewGame(selectedIndices);
       });
 
+      // Gestione Preset Punteggio Massimo
       const presetBtns = document.querySelectorAll('.preset-score-btn');
       presetBtns.forEach(btn => {
         btn.addEventListener('click', () => {
