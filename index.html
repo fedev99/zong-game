@@ -506,8 +506,11 @@
   <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-md w-full max-h-[80vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-         <i data-lucide="book-open" class="w-5 h-5 text-purple-300"></i>
-        <h3 class="text-base font-bold text-purple-300 font-display">Regole ZONG (5 Dadi)</h3>
+        <!-- Contenitore flex con gap-2 per staccare l'icona dal testo -->
+        <div class="flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5 text-purple-300"></i>
+          <h3 class="text-base font-bold text-purple-300 font-display">Regole ZONG (5 Dadi)</h3>
+        </div>
         <button id="btnCloseRules" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="overflow-y-auto space-y-3 py-3 text-xs text-zinc-300">
@@ -524,13 +527,16 @@
   </div>
 
   <!-- LEADERBOARD MODAL -->
-  <div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+<div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-        <div>
-          <i data-lucide="trophy" class="w-5 h-5 text-esmerald-300"></i>
-          <h3 class="text-base font-bold text-esmerald-300 font-display">Classifica Punti Partita</h3>
-          <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
+        <!-- Contenitore flessibile per allineare icona e titolo in orizzontale -->
+        <div class="flex items-center gap-2">
+          <i data-lucide="trophy" class="w-5 h-5 text-emerald-300"></i>
+          <div>
+            <h3 class="text-base font-bold text-emerald-300 font-display">Classifica Punti Partita</h3>
+            <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
+          </div>
         </div>
         <button id="btnCloseLeaderboard"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
