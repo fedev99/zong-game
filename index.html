@@ -135,7 +135,6 @@
     .glow-gold { box-shadow: 0 0 25px rgba(234, 179, 8, 0.25); }
     .glow-red { box-shadow: 0 0 35px rgba(239, 68, 68, 0.45); }
     
-    /* Animazione Pop-up Veloce Notifica */
     @keyframes toastFadeInOut {
       0% { opacity: 0; transform: translate(-50%, -20px) scale(0.9); }
       15% { opacity: 1; transform: translate(-50%, 0) scale(1); }
@@ -149,7 +148,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between overflow-x-hidden p-2 sm:p-4">
 
-  <!-- POP-UP NOTIFICA NON INVASIVO PER GLI AVVERSARI -->
+  <!-- POP-UP NOTIFICA NON INVASIVO -->
   <div id="quickToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] hidden pointer-events-none">
     <div id="toastContent" class="px-4 py-2.5 rounded-2xl bg-zinc-900/95 border text-xs sm:text-sm font-bold shadow-2xl backdrop-blur-md flex items-center gap-2.5">
       <span id="toastIcon">🔥</span>
@@ -195,7 +194,6 @@
         <button id="btnConfirmNewGame" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs">Avvia</button>
       </div>
 
-      <!-- BOTTONE PER USCIRE DALLA STANZA -->
       <div class="border-t border-zinc-800 pt-3">
         <button id="btnLeaveRoom" class="w-full py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-800/80 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5 transition">
           <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
@@ -205,7 +203,7 @@
     </div>
   </div>
 
-  <!-- MODAL IMPOSTA PUNTEGGIO MASSIMO -->
+  <!-- MODALE PUNTEGGIO MASSIMO -->
   <div id="targetScoreModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-xs w-full shadow-2xl">
       <div class="flex items-center gap-2 mb-2 text-amber-400">
@@ -214,7 +212,6 @@
       </div>
       <p class="text-xs text-zinc-400 mb-3">Scegli o inserisci il punteggio necessario per vincere la partita:</p>
       
-      <!-- Preset Buttons -->
       <div class="grid grid-cols-2 gap-2 mb-3">
         <button type="button" class="preset-score-btn py-1.5 px-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-xs font-bold text-amber-300 transition" data-value="2500">2.500 pt</button>
         <button type="button" class="preset-score-btn py-1.5 px-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-xs font-bold text-amber-300 transition" data-value="5000">5.000 pt</button>
@@ -227,6 +224,35 @@
         <button id="btnCancelTargetScore" class="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Annulla</button>
         <button id="btnSaveTargetScore" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs">Conferma</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODALE RECORD (Doppia Classifica) -->
+  <div id="recordsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
+        <div class="flex items-center gap-2 text-amber-400">
+          <i data-lucide="trophy" class="w-5 h-5"></i>
+          <h3 class="text-base font-bold text-white font-display">Classifica Record</h3>
+        </div>
+        <button id="btnCloseRecords" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <div class="overflow-y-auto space-y-4 py-1 pr-1 text-xs">
+        <!-- Sezione Record Scalato (Puro) -->
+        <div>
+          <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-1">🔥 Record Scalato (Puro da 5 dadi)</span>
+          <div id="scaledRecordsContainer" class="space-y-1.5"></div>
+        </div>
+
+        <!-- Sezione Record con Eredità (Totale) -->
+        <div class="border-t border-zinc-800 pt-3">
+          <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">🤝 Record con Eredità (Totale Turno)</span>
+          <div id="inheritedRecordsContainer" class="space-y-1.5"></div>
+        </div>
+      </div>
+      
+      <button id="btnGotItRecords" class="w-full py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs mt-3">Chiudi</button>
     </div>
   </div>
 
@@ -245,24 +271,27 @@
 
     <!-- Actions -->
     <div class="flex items-center gap-1.5 sm:gap-2">
-     
       <button id="btnSound" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300">
         <i data-lucide="volume-2" class="w-4 h-4"></i>
       </button>
 
-       <!-- Icona Target Score per Smartphone (solo icona) -->
       <button id="btnTargetScoreMobile" class="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400 sm:hidden flex items-center justify-center">
         <i data-lucide="target" class="w-4 h-4"></i>
       </button>
 
-       <!-- Icona/Bottone Target Score per Desktop/Tablet -->
       <button id="btnTargetScoreHeader" class="hidden sm:flex p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400 text-xs font-semibold items-center gap-1">
         <i data-lucide="target" class="w-4 h-4"></i>
         <span id="targetScoreHeaderLabel" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <button id="btnLeaderboard" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-300 text-xs font-semibold flex items-center gap-1">
+      <!-- BOTTONE RECORD (Trophy) -->
+      <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-300 text-xs font-semibold flex items-center gap-1">
         <i data-lucide="trophy" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Record</span>
+      </button>
+
+      <button id="btnLeaderboard" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-300 text-xs font-semibold flex items-center gap-1">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
         <span class="hidden sm:inline">Classifica</span>
       </button>
 
@@ -421,7 +450,7 @@
       </div>
     </div>
 
-    <!-- Chat di Gruppo Stanza -->
+    <!-- Chat di Gruppo Stanza (Sincronizzata e Persistente) -->
     <div class="rounded-xl bg-zinc-900/70 border border-zinc-800 p-3 flex flex-col gap-2">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
@@ -441,7 +470,7 @@
     </div>
   </main>
 
-  <!-- FOOTER PERSONALIZZATO -->
+  <!-- FOOTER -->
   <footer class="w-full text-center py-3 border-t border-zinc-900 text-zinc-500 text-xs font-medium tracking-wide">
     ZONG • Creato da Tex Willa
   </footer>
@@ -466,7 +495,6 @@
       <h2 class="text-xl font-black text-amber-400 font-display" id="winnerTitle">VITTORIA!</h2>
       <p class="text-xs text-zinc-300 my-1" id="winnerSubtitle">Vittoria!</p>
       
-      <!-- Classifica Finale all'interno del modale di vittoria -->
       <div class="mt-3 text-left">
         <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Classifica Finale</span>
         <div id="winLeaderboardContainer" class="space-y-1.5 max-h-36 overflow-y-auto mb-3"></div>
@@ -501,7 +529,7 @@
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
         <div>
-          <h3 class="text-base font-bold text-white font-display">Classifica</h3>
+          <h3 class="text-base font-bold text-white font-display">Classifica Punti Partita</h3>
           <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
         </div>
         <button id="btnCloseLeaderboard"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -551,7 +579,7 @@
     }
 
     // -------------------------------------------------------------
-    // CONFIGURAZIONE SUPABASE PER LA SALA ONLINE
+    // CONFIGURAZIONE SUPABASE
     // -------------------------------------------------------------
     const SUPABASE_URL = 'https://ttajaifqzjpdfxvrvdnf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0YWphaWZxempwZGZ4dnJ2ZG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNzk1MjAsImV4cCI6MjEwNzc1NTUyMH0.VOd9PManWdsbykk7MLpvgBlrXAKmTxTOQqUV63Q1_J4';
@@ -564,9 +592,8 @@
     localStorage.setItem("zong_my_player_id", myPlayerId);
 
     let lastEventId = null;
-    let roomChannel = null;
 
-    // Fallback aptico per iOS Safari 17.4+
+    // Fallback aptico iOS
     let _hapticLabel = null;
     let _lastIosTick = 0;
     function iosTick() {
@@ -718,7 +745,8 @@
       playerIds: {},   
       playerNames: {},
       scores: {},
-      records: {},
+      records: {},          // Record scalato (puro, da 5 dadi)
+      inheritedRecords: {}, // Record con eredità (totale turno)
       hasEntered: {},
       zongCounts: {},
       totalRolls: {},
@@ -736,6 +764,7 @@
       inheritedScore: 0,       
       securedInSubTurn: false,
       logs: [],
+      chatLogs: [], // Cronologia chat salvata nella stanza
       lastEvent: null
     };
 
@@ -900,6 +929,15 @@
     const leaderboardModal = document.getElementById('leaderboardModal');
     const leaderboardContainer = document.getElementById('leaderboardContainer');
     const leaderboardTargetLabel = document.getElementById('leaderboardTargetLabel');
+    
+    // Modale Record & Doppia Classifica
+    const btnRecordsModal = document.getElementById('btnRecordsModal');
+    const recordsModal = document.getElementById('recordsModal');
+    const btnCloseRecords = document.getElementById('btnCloseRecords');
+    const btnGotItRecords = document.getElementById('btnGotItRecords');
+    const scaledRecordsContainer = document.getElementById('scaledRecordsContainer');
+    const inheritedRecordsContainer = document.getElementById('inheritedRecordsContainer');
+
     const zongModal = document.getElementById('zongModal');
     const winModal = document.getElementById('winModal');
     const winLeaderboardContainer = document.getElementById('winLeaderboardContainer');
@@ -1031,7 +1069,7 @@
     }
 
     // -------------------------------------------------------------
-    // GESTIONE CHAT DI GRUPPO
+    // GESTIONE CHAT DI GRUPPO PERSISTENTE SULLA STANZA
     // -------------------------------------------------------------
     function appendChatMessage(sender, text, isSelf = false) {
       if (!chatLogContainer) return;
@@ -1043,42 +1081,43 @@
       chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
     }
 
+    function renderChatHistory() {
+      if (!chatLogContainer) return;
+      chatLogContainer.innerHTML = '';
+      if (!GameState.chatLogs || GameState.chatLogs.length === 0) {
+        chatLogContainer.innerHTML = `<p class="text-zinc-500 italic text-[11px]">Chat della stanza attiva. Scrivi un messaggio qui sotto!</p>`;
+        return;
+      }
+      GameState.chatLogs.forEach(c => {
+        const isSelf = c.senderId === myPlayerId;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `text-xs leading-tight font-sans ${isSelf ? 'text-blue-300' : 'text-zinc-200'}`;
+        msgDiv.innerHTML = `<span class="text-[10px] text-zinc-500 mr-1">[${c.time}]</span><strong class="font-semibold ${isSelf ? 'text-blue-400' : 'text-amber-400'}">${c.sender}:</strong> <span>${escapeHtml(c.message)}</span>`;
+        chatLogContainer.appendChild(msgDiv);
+      });
+      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
+    }
+
     function escapeHtml(text) {
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    function setupChatChannel() {
-      if (!roomCode || !supabaseClient) return;
-      if (roomChannel) {
-        supabaseClient.removeChannel(roomChannel);
-      }
-      roomChannel = supabaseClient.channel('chat-' + roomCode, {
-        config: { broadcast: { self: true } }
-      });
-
-      roomChannel
-        .on('broadcast', { event: 'chat-msg' }, payload => {
-          if (payload && payload.payload) {
-            const { sender, message, senderId } = payload.payload;
-            appendChatMessage(sender, message, senderId === myPlayerId);
-          }
-        })
-        .subscribe();
-    }
-
     if (chatForm) {
-      chatForm.addEventListener('submit', (e) => {
+      chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const msg = chatInput.value.trim();
-        if (!msg || !roomChannel) return;
+        if (!msg || !roomCode) return;
 
         const senderName = getMyPlayerName();
-        roomChannel.send({
-          type: 'broadcast',
-          event: 'chat-msg',
-          payload: { sender: senderName, message: msg, senderId: myPlayerId }
-        });
+        const timeStr = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        
+        if (!GameState.chatLogs) GameState.chatLogs = [];
+        GameState.chatLogs.push({ sender: senderName, message: msg, senderId: myPlayerId, time: timeStr });
+        if (GameState.chatLogs.length > 100) GameState.chatLogs.shift();
+
         chatInput.value = '';
+        renderChatHistory();
+        await saveStateToCloud();
       });
     }
 
@@ -1089,9 +1128,13 @@
       playersContainer.innerHTML = '';
       const totalCards = GameState.numPlayers;
       if (!GameState.records) GameState.records = {};
+      if (!GameState.inheritedRecords) GameState.inheritedRecords = {};
+      
       for(let i=1; i<=totalCards; i++) {
         if (!GameState.scores[i]) GameState.scores[i] = 0;
         if (GameState.records[i] === undefined) GameState.records[i] = 0;
+        if (GameState.inheritedRecords[i] === undefined) GameState.inheritedRecords[i] = 0;
+        
         const card = document.createElement('div');
         card.id = `cardP${i}`;
         const playerColor = PLAYER_COLORS[(i - 1) % PLAYER_COLORS.length];
@@ -1163,6 +1206,7 @@
       }
 
       renderLeaderboard();
+      renderRecordsModals();
 
       const selectedIndices = [];
       const selectedValues = [];
@@ -1363,6 +1407,56 @@
       });
     }
 
+    // Rendering della doppia classifica record nel modale Record
+    function renderRecordsModals() {
+      if (!scaledRecordsContainer || !inheritedRecordsContainer) return;
+      
+      scaledRecordsContainer.innerHTML = '';
+      inheritedRecordsContainer.innerHTML = '';
+
+      if (!GameState.records) GameState.records = {};
+      if (!GameState.inheritedRecords) GameState.inheritedRecords = {};
+
+      const scaledList = [];
+      const inheritedList = [];
+
+      for (let i = 1; i <= GameState.numPlayers; i++) {
+        scaledList.push({ id: i, score: GameState.records[i] || 0 });
+        inheritedList.push({ id: i, score: GameState.inheritedRecords[i] || 0 });
+      }
+
+      scaledList.sort((a, b) => b.score - a.score);
+      inheritedList.sort((a, b) => b.score - a.score);
+
+      // Popola Record Scalato (Puro)
+      scaledList.forEach((p, idx) => {
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800";
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
+            <span class="text-xs font-bold text-zinc-200">${getPlayerName(p.id)}</span>
+          </div>
+          <span class="text-xs font-black text-amber-300">${p.score} pt</span>
+        `;
+        scaledRecordsContainer.appendChild(row);
+      });
+
+      // Popola Record con Eredità (Totale)
+      inheritedList.forEach((p, idx) => {
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800";
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full flex items-center justify-center bg-zinc-800 text-xs font-bold">${idx + 1}</span>
+            <span class="text-xs font-bold text-zinc-200">${getPlayerName(p.id)}</span>
+          </div>
+          <span class="text-xs font-black text-blue-300">${p.score} pt</span>
+        `;
+        inheritedRecordsContainer.appendChild(row);
+      });
+    }
+
     function applyCubeRotation(cubeEl, faceNumber) {
       const rot = faceRotations[faceNumber] || { x: 0, y: 0 };
       cubeEl.style.transform = `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
@@ -1553,11 +1647,22 @@
         addLog(`🔓 ${getPlayerName(GameState.activePlayer)} ha aperto (500+ pt)!`, true);
       }
 
+      // Aggiornamento dei record differenziati
       if (!GameState.records) GameState.records = {};
-      const currentRecord = GameState.records[GameState.activePlayer] || 0;
-      if (!GameState.isInheritedTurn && finalTurnTotal > currentRecord) {
+      if (!GameState.inheritedRecords) GameState.inheritedRecords = {};
+
+      const currentScaledRecord = GameState.records[GameState.activePlayer] || 0;
+      const currentInheritedRecord = GameState.inheritedRecords[GameState.activePlayer] || 0;
+
+      // 1. Record Scalato (puro, senza eredità)
+      if (!GameState.isInheritedTurn && finalTurnTotal > currentScaledRecord) {
         GameState.records[GameState.activePlayer] = finalTurnTotal;
-        addLog(`🏆 Nuovo record per ${getPlayerName(GameState.activePlayer)}: ${finalTurnTotal} pt!`, true);
+        addLog(`🏆 Nuovo Record Scalato per ${getPlayerName(GameState.activePlayer)}: ${finalTurnTotal} pt!`, true);
+      }
+
+      // 2. Record con Eredità (totale turno)
+      if (finalTurnTotal > currentInheritedRecord) {
+        GameState.inheritedRecords[GameState.activePlayer] = finalTurnTotal;
       }
 
       GameState.scores[GameState.activePlayer] += finalTurnTotal;
@@ -1695,7 +1800,6 @@
     async function startNewGame(selectedPlayerIndices) {
       triggerHaptic(30);
       
-      // Shuffle casuale degli indici selezionati (Fisher-Yates)
       const shuffledIndices = [...selectedPlayerIndices];
       for (let i = shuffledIndices.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -1706,6 +1810,7 @@
       const newPlayerNames = {};
       const newScores = {};
       const newRecords = {};
+      const newInheritedRecords = {};
       const newHasEntered = {};
       const newZongCounts = {};
       const newTotalRolls = {};
@@ -1717,6 +1822,7 @@
         newPlayerNames[newCount] = GameState.playerNames[oldIdx];
         newScores[newCount] = 0;
         newRecords[newCount] = (GameState.records && GameState.records[oldIdx]) ? GameState.records[oldIdx] : 0;
+        newInheritedRecords[newCount] = (GameState.inheritedRecords && GameState.inheritedRecords[oldIdx]) ? GameState.inheritedRecords[oldIdx] : 0;
         newHasEntered[newCount] = false;
         newZongCounts[newCount] = 0;
         newTotalRolls[newCount] = 0;
@@ -1727,6 +1833,7 @@
       GameState.playerNames = newPlayerNames;
       GameState.scores = newScores;
       GameState.records = newRecords;
+      GameState.inheritedRecords = newInheritedRecords;
       GameState.hasEntered = newHasEntered;
       GameState.zongCounts = newZongCounts;
       GameState.totalRolls = newTotalRolls;
@@ -1747,7 +1854,7 @@
       await saveStateToCloud();
     }
 
-    // GESTIONE ACCESSO STANZA ONLINE CON SALVATAGGIO COOKIE E CONTROLLO RIENTRO
+    // GESTIONE ACCESSO E RIENTRO CORRETTO NELLA STANZA
     async function joinRoomProcess(name, code, targetScoreFromInput) {
       roomCode = code;
 
@@ -1760,7 +1867,7 @@
         }
 
         if (!data) {
-          // Stanza nuova
+          // Creazione nuova stanza
           const tScore = targetScoreFromInput || 10000;
           GameState.targetScore = tScore;
           TARGET_SCORE = tScore;
@@ -1769,52 +1876,53 @@
           GameState.playerNames = { 1: name };
           GameState.scores = { 1: 0 };
           GameState.records = { 1: 0 };
+          GameState.inheritedRecords = { 1: 0 };
           GameState.hasEntered = { 1: false };
           GameState.zongCounts = { 1: 0 };
           GameState.totalRolls = { 1: 0 };
           GameState.activePlayer = 1;
           GameState.logs = [{ text: "Nuova stanza creata. Benvenuto!", highlight: false, isZong: false }];
+          GameState.chatLogs = [];
           
           await supabaseClient.from('rooms').insert([{ code: roomCode, state: GameState }]);
         } else {
           // Stanza esistente
           Object.assign(GameState, data.state);
           TARGET_SCORE = GameState.targetScore || 10000;
+          if (!GameState.chatLogs) GameState.chatLogs = [];
+          if (!GameState.inheritedRecords) GameState.inheritedRecords = {};
           
           let existingPlayerIndex = -1;
-          let nameExists = false;
 
           for (let i = 1; i <= GameState.numPlayers; i++) {
-            if (GameState.playerIds[i] === myPlayerId) {
+            if (GameState.playerIds[i] === myPlayerId || GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
               existingPlayerIndex = i;
-            } else if (GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
-              existingPlayerIndex = i; // Trovato un giocatore con lo stesso nome
-              nameExists = true;
+              break;
             }
           }
 
           if (existingPlayerIndex !== -1) {
-            // Giocatore già presente nella stanza
-            const confirmReentry = confirm(`Il giocatore "${name}" è già presente in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
+            // Giocatore già esistente: chiedi conferma di rientro
+            const confirmReentry = confirm(`Il giocatore "${name}" risulta già registrato in questa stanza. Vuoi rientrare e riprendere i tuoi punti?`);
             if (confirmReentry) {
-              // Riconnetti il giocatore mantenendo il suo ID e punteggio
               myPlayerId = GameState.playerIds[existingPlayerIndex];
               GameState.playerNames[existingPlayerIndex] = name;
               setCookie("zong_my_player_id", myPlayerId);
               localStorage.setItem("zong_my_player_id", myPlayerId);
               await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
             } else {
-              // L'utente rifiuta: ritorna all'inserimento dati
               return false;
             }
           } else {
-            // Nuovo giocatore che si aggiunge alla stanza
+            // Nuovo giocatore che si unisce
             GameState.numPlayers++;
             GameState.playerIds[GameState.numPlayers] = myPlayerId;
             GameState.playerNames[GameState.numPlayers] = name;
             GameState.scores[GameState.numPlayers] = 0;
             if (!GameState.records) GameState.records = {};
             GameState.records[GameState.numPlayers] = 0;
+            if (!GameState.inheritedRecords) GameState.inheritedRecords = {};
+            GameState.inheritedRecords[GameState.numPlayers] = 0;
             GameState.hasEntered[GameState.numPlayers] = false;
             if (!GameState.zongCounts) GameState.zongCounts = {};
             GameState.zongCounts[GameState.numPlayers] = 0;
@@ -1824,7 +1932,7 @@
           }
         }
 
-        // Salvataggio nei cookie e localStorage dell'accesso riuscito
+        // Salvataggio credenziali stanza
         setCookie("zong_player_name", name);
         setCookie("zong_room_code", roomCode);
         localStorage.setItem("zong_player_name", name);
@@ -1833,7 +1941,7 @@
         roomModal.classList.add('hidden');
         roomBadge.textContent = `Stanza: ${roomCode}`;
 
-        // Sincronizzazione Realtime dello Stato del Gioco
+        // Sincronizzazione Realtime
         supabaseClient.channel('room-sync-' + roomCode)
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, payload => {
             if (payload.new && payload.new.state) {
@@ -1845,7 +1953,11 @@
                 }
               }
               Object.assign(GameState, newState);
+              if (!GameState.chatLogs) GameState.chatLogs = [];
+              if (!GameState.inheritedRecords) GameState.inheritedRecords = {};
               
+              renderChatHistory();
+
               if (winModal && !winModal.classList.contains('hidden') === false) {
                 for (let i = 1; i <= GameState.numPlayers; i++) {
                   if (GameState.scores[i] >= TARGET_SCORE) {
@@ -1863,7 +1975,7 @@
           })
           .subscribe();
 
-        setupChatChannel();
+        renderChatHistory();
         initScoreboard();
         updateUI();
         return true;
@@ -1884,22 +1996,16 @@
       await joinRoomProcess(name, code, tScore);
     });
 
-    // AZIONE PER USCIRE DALLA STANZA CORRENTE
     if (btnLeaveRoom) {
       btnLeaveRoom.addEventListener('click', () => {
         triggerHaptic(20);
         eraseCookie("zong_room_code");
         localStorage.removeItem("zong_room_code");
 
-        if (roomChannel) {
-          supabaseClient.removeChannel(roomChannel);
-        }
-
         roomCode = null;
         newGameModal.classList.add('hidden');
         roomBadge.textContent = "Stanza: --";
         
-        // Reset dei valori e apertura modale login
         if (inputRoomCode) inputRoomCode.value = '';
         roomModal.classList.remove('hidden');
       });
@@ -1909,7 +2015,6 @@
       GameState.dice.forEach((d, i) => applyCubeRotation(cubeElements[i], d.value));
       diceContainers.forEach((el, index) => el.addEventListener('click', () => onDiceClick(index)));
 
-      // CONTROLLO COOKIE PER REINDIRIZZAMENTO AUTOMATICO SE GIÀ ENTRATO
       const savedName = getCookie("zong_player_name") || localStorage.getItem("zong_player_name");
       const savedRoom = getCookie("zong_room_code") || localStorage.getItem("zong_room_code");
 
@@ -1975,7 +2080,6 @@
         startNewGame(selectedIndices);
       });
 
-      // Gestione Preset Punteggio Massimo
       const presetBtns = document.querySelectorAll('.preset-score-btn');
       presetBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1991,6 +2095,11 @@
       if (btnTargetScoreMobile) btnTargetScoreMobile.addEventListener('click', openTargetScoreModal);
       if (btnCancelTargetScore) btnCancelTargetScore.addEventListener('click', closeTargetScoreModal);
       if (btnSaveTargetScore) btnSaveTargetScore.addEventListener('click', saveTargetScoreFromModal);
+
+      // Gestione modale Record (Bottone Trophy)
+      if (btnRecordsModal) btnRecordsModal.addEventListener('click', () => { triggerHaptic(20); renderRecordsModals(); recordsModal.classList.remove('hidden'); });
+      if (btnCloseRecords) btnCloseRecords.addEventListener('click', () => { triggerHaptic(20); recordsModal.classList.add('hidden'); });
+      if (btnGotItRecords) btnGotItRecords.addEventListener('click', () => { triggerHaptic(20); recordsModal.classList.add('hidden'); });
 
       btnLeaderboard.addEventListener('click', () => { triggerHaptic(20); leaderboardModal.classList.remove('hidden'); });
       btnCloseLeaderboard.addEventListener('click', () => { triggerHaptic(20); leaderboardModal.classList.add('hidden'); });
