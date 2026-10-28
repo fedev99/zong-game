@@ -282,7 +282,6 @@
         <span id="targetScoreHeaderLabel" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <!-- BOTTONE RECORD AGGIORNATO (STESSO SFONDO DEGLI ALTRI, TESTO PINK) -->
       <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-pink-400 text-xs font-semibold flex items-center gap-1 hover:border-pink-500/50 transition">
         <i data-lucide="trophy" class="w-4 h-4 text-pink-400"></i>
         <span class="hidden sm:inline">Record</span>
@@ -537,9 +536,6 @@
   </div>
 
   <script>
-    // -------------------------------------------------------------
-    // GESTIONE COOKIE & PERSISTENZA UTENTE
-    // -------------------------------------------------------------
     function setCookie(name, value, days = 30) {
       const d = new Date();
       d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -573,9 +569,6 @@
       return (array[0] % 6) + 1;
     }
 
-    // -------------------------------------------------------------
-    // CONFIGURAZIONE SUPABASE
-    // -------------------------------------------------------------
     const SUPABASE_URL = 'https://ttajaifqzjpdfxvrvdnf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0YWphaWZxempwZGZ4dnJ2ZG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNzk1MjAsImV4cCI6MjEwNzc1NTUyMH0.VOd9PManWdsbykk7MLpvgBlrXAKmTxTOQqUV63Q1_J4';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -587,6 +580,7 @@
     localStorage.setItem("zong_my_player_id", myPlayerId);
 
     let lastEventId = null;
+    let supabaseChannel = null;
 
     const PLAYER_COLORS = [
       '#fbbf24', '#3b82f6', '#10b981', '#a855f7', '#f43f5e',
@@ -1829,6 +1823,7 @@
       ];
       GameState.logs = [];
       addLog(`🎲 Nuova partita avviata! Ordine di gioco estratto casualmente.`);
+      winModal.classList.add('hidden');
       initScoreboard();
       updateUI();
       await saveStateToCloud();
@@ -1871,7 +1866,6 @@
           
           let existingPlayerIndex = -1;
 
-          // Controlla se il giocatore è già presente tramite il suo IDunivoco o lo stesso nome nella sessione
           for (let i = 1; i <= GameState.numPlayers; i++) {
             if (GameState.playerIds[i] === myPlayerId) {
               existingPlayerIndex = i;
@@ -1880,7 +1874,6 @@
           }
 
           if (existingPlayerIndex === -1 && !isPageRefresh) {
-            // Controlla omonimia se non è un refresh automatico
             for (let i = 1; i <= GameState.numPlayers; i++) {
               if (GameState.playerNames[i].toLowerCase() === name.toLowerCase()) {
                 existingPlayerIndex = i;
@@ -1900,7 +1893,6 @@
             localStorage.setItem("zong_my_player_id", myPlayerId);
             await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
           } else {
-            // Aggiunge un nuovo giocatore
             GameState.numPlayers++;
             GameState.playerIds[GameState.numPlayers] = myPlayerId;
             GameState.playerNames[GameState.numPlayers] = name;
@@ -1926,7 +1918,11 @@
         roomModal.classList.add('hidden');
         roomBadge.textContent = `Stanza: ${roomCode}`;
 
-        supabaseClient.channel('room-sync-' + roomCode)
+        if (supabaseChannel) {
+          supabaseClient.removeChannel(supabaseChannel);
+        }
+
+        supabaseChannel = supabaseClient.channel('room-sync-' + roomCode)
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `code=eq.${roomCode}` }, payload => {
             if (payload.new && payload.new.state) {
               const newState = payload.new.state;
@@ -1942,12 +1938,10 @@
               
               renderChatHistory();
 
-              if (winModal && !winModal.classList.contains('hidden') === false) {
+              if (winModal && winModal.classList.contains('hidden')) {
                 for (let i = 1; i <= GameState.numPlayers; i++) {
-                  if (GameState.scores[i] >= TARGET_SCORE) {
-                    if (winModal.classList.contains('hidden')) {
-                      triggerVictory(i, GameState.scores[i]);
-                    }
+                  if (GameState.scores[i] >= (GameState.targetScore || TARGET_SCORE)) {
+                    triggerVictory(i, GameState.scores[i]);
                     break;
                   }
                 }
@@ -1986,6 +1980,11 @@
         eraseCookie("zong_room_code");
         localStorage.removeItem("zong_room_code");
 
+        if (supabaseChannel) {
+          supabaseClient.removeChannel(supabaseChannel);
+          supabaseChannel = null;
+        }
+
         roomCode = null;
         newGameModal.classList.add('hidden');
         roomBadge.textContent = "Stanza: --";
@@ -2006,7 +2005,6 @@
       if (savedRoom) inputRoomCode.value = savedRoom;
 
       if (savedName && savedRoom) {
-        // Rientro automatico pulito al refresh della pagina senza pop-up fastidiosi
         await joinRoomProcess(savedName, savedRoom, 10000, true);
       }
 
