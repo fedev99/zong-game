@@ -28,6 +28,22 @@
     }
     .font-display { font-family: 'Outfit', sans-serif; }
 
+    /* Banner per assenza di connessione */
+    .offline-banner {
+      background-color: #ef4444;
+      color: white;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 0.25rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
     /* 3D Dice Perspective and Cube Styles */
     .dice-scene {
       perspective: 700px;
@@ -147,6 +163,11 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between overflow-x-hidden p-2 sm:p-4">
+
+  <!-- BANNER CONNESSIONE DEBOLE / ASSENTE -->
+  <div id="offlineNotice" class="offline-banner hidden">
+    ⚠️ Connessione debole o assente. Salvataggio in corso appena torna il segnale...
+  </div>
 
   <!-- POP-UP NOTIFICA -->
   <div id="quickToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] hidden pointer-events-none">
@@ -285,7 +306,6 @@
         <span id="targetScoreHeaderLabel" class="hidden sm:inline">10.000 pt</span>
       </button>
 
-      <!-- BOTTONE RECORD CON STESSO SFONDO DEGLI ALTRI E SOLO TESTO ORANGE -->
       <button id="btnRecordsModal" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-orange-400 text-xs font-semibold flex items-center gap-1 transition">
         <i data-lucide="award" class="w-4 h-4 text-orange-400"></i>
         <span class="hidden sm:inline">Record</span>
@@ -509,7 +529,6 @@
   <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-md w-full max-h-[80vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-        <!-- Contenitore flex con gap-2 per staccare l'icona dal testo -->
         <div class="flex items-center gap-2">
           <i data-lucide="book-open" class="w-5 h-5 text-purple-300"></i>
           <h3 class="text-base font-bold text-purple-300 font-display">Regole ZONG (5 Dadi)</h3>
@@ -530,40 +549,16 @@
   </div>
 
   <!-- LEADERBOARD MODAL -->
-
-<div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-        <!-- Contenitore flessibile: affianca l'icona al blocco di testo -->
         <div class="flex items-center gap-2">
           <i data-lucide="trophy" class="w-5 h-5 text-emerald-300"></i>
-          
-          <!-- Blocco di testo: h3 e p uno sotto l'altro -->
           <div>
             <h3 class="text-base font-bold text-emerald-300 font-display">Classifica Punti Partita</h3>
             <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
           </div>
         </div>
-
-
-  <!--
-<div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full">
-      <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3">
-         Contenitore flessibile: affianca l'icona al blocco di testo 
-        <div class="flex items-center gap-2">
-          <i data-lucide="trophy" class="w-5 h-5 text-emerald-300"></i>
-          
-          -- Blocco di testo: h3 e p uno sotto l'altro 
-          <div>
-            <h3 class="text-base font-bold text-emerald-300 font-display">Classifica Punti Partita</h3>
-            <p id="leaderboardTargetLabel" class="text-[10px] text-amber-400 font-semibold"></p>
-          </div>
-        </div>
-
-
-
-      -->
         <button id="btnCloseLeaderboard"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div id="leaderboardContainer" class="space-y-2"></div>
@@ -611,11 +606,21 @@
     }
 
     // -------------------------------------------------------------
-    // CONFIGURAZIONE SUPABASE
+    // CONFIGURAZIONE SUPABASE E RETE ADVANCED
     // -------------------------------------------------------------
     const SUPABASE_URL = 'https://ttajaifqzjpdfxvrvdnf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0YWphaWZxempwZGZ4dnJ2ZG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNzk1MjAsImV4cCI6MjEwNzc1NTUyMH0.VOd9PManWdsbykk7MLpvgBlrXAKmTxTOQqUV63Q1_J4';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // Configurazione con ripristino automatico connessione per segnale debole
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+        timeout: 20000,
+        heartbeatIntervalMs: 15000,
+      },
+    });
 
     let roomCode = null;
     let savedMyId = getCookie("zong_my_player_id") || localStorage.getItem("zong_my_player_id");
@@ -624,6 +629,60 @@
     localStorage.setItem("zong_my_player_id", myPlayerId);
 
     let lastEventId = null;
+
+    // SISTEMA DI CODA E RETRY IN BACKGROUND
+    const writeQueue = [];
+    let isProcessingQueue = false;
+
+    window.addEventListener('online', syncWriteQueue);
+    window.addEventListener('offline', updateConnectionStatus);
+
+    function updateConnectionStatus() {
+      const banner = document.getElementById('offlineNotice');
+      if (!banner) return;
+      if (!navigator.onLine) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    async function saveStateToCloud() {
+      if (!roomCode) return;
+      writeQueue.push({ roomCode: roomCode, statePayload: JSON.parse(JSON.stringify(GameState)) });
+      if (navigator.onLine) {
+        await syncWriteQueue();
+      } else {
+        updateConnectionStatus();
+      }
+    }
+
+    async function syncWriteQueue() {
+      updateConnectionStatus();
+      if (isProcessingQueue || writeQueue.length === 0 || !navigator.onLine) return;
+      isProcessingQueue = true;
+
+      while (writeQueue.length > 0) {
+        const item = writeQueue[0];
+        try {
+          const { error } = await supabaseClient
+            .from('rooms')
+            .update({ state: item.statePayload })
+            .eq('code', item.roomCode);
+
+          if (!error) {
+            writeQueue.shift();
+          } else {
+            console.warn("Retrying database write in 2 seconds...", error);
+            await new Promise(r => setTimeout(r, 2000));
+          }
+        } catch (e) {
+          console.error("Network error saving state:", e);
+          break;
+        }
+      }
+      isProcessingQueue = false;
+    }
 
     // 10 COLORI BRILLANTI E BEN DISTINTI PER FINO A 10 GIOCATORI
     const PLAYER_COLORS = [
@@ -1500,11 +1559,6 @@
     function applyCubeRotation(cubeEl, faceNumber) {
       const rot = faceRotations[faceNumber] || { x: 0, y: 0 };
       cubeEl.style.transform = `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
-    }
-
-    async function saveStateToCloud() {
-      if (!roomCode) return;
-      await supabaseClient.from('rooms').update({ state: GameState }).eq('code', roomCode);
     }
 
     async function rollDice() {
