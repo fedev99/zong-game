@@ -166,7 +166,7 @@
 
   <!-- BANNER CONNESSIONE DEBOLE / ASSENTE -->
   <div id="offlineNotice" class="offline-banner hidden">
-    ⚠️ Connessione debole o assente. Salvataggio in corso appena torna il segnale...
+    ⚠️ Connessione debole o assente. Salvataggio in background...
   </div>
 
   <!-- POP-UP NOTIFICA -->
@@ -203,10 +203,27 @@
     </div>
   </div>
 
+  <!-- MODALE MODIFICA GIOCATORI ATTUALI (Senza riavviare) -->
+  <div id="editPlayersModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full text-center">
+      <div class="flex items-center gap-2 mb-2 text-blue-400 justify-center">
+        <i data-lucide="users" class="w-5 h-5"></i>
+        <h3 class="text-base font-bold text-blue-300 font-display">Modifica Giocatori</h3>
+      </div>
+      <p class="text-xs text-zinc-400 mb-4">Scegli chi partecipa a questa partita (senza azzerare i punti):</p>
+      <div id="editPlayerSelectList" class="space-y-2 text-left mb-4 max-h-48 overflow-y-auto"></div>
+      
+      <div class="flex gap-2 mb-3">
+        <button id="btnCancelEditPlayers" class="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs">Annulla</button>
+        <button id="btnConfirmEditPlayers" class="flex-1 py-2.5 rounded-xl bg-blue-500 text-zinc-950 font-bold text-xs hover:bg-blue-400">Cambia giocatori</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODALE SELEZIONE GIOCATORI NUOVA PARTITA -->
   <div id="newGameModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 max-w-sm w-full text-center">
-        <div class="flex items-center gap-2 mb-2 text-red-400">
+        <div class="flex items-center gap-2 mb-2 text-red-400 justify-center">
         <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
         <h3 class="text-base font-bold text-red-300 font-display">Nuova Partita! Seleziona Giocatori</h3>
       </div>
@@ -286,7 +303,7 @@
       </div>
       <div>
         <h1 class="text-xl sm:text-2xl font-black tracking-wider text-white font-display flex items-center gap-1.5">
-          ZONG <span id="roomBadge" class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/35">Stanza: --</span>
+          ZONG <button id="roomBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-600/20 text-blue-300 border border-blue-500/50 hover:bg-blue-500/30 transition">Stanza: --</button>
         </h1>
       </div>
     </div>
@@ -630,7 +647,7 @@
 
     let lastEventId = null;
 
-    // SISTEMA DI CODA E RETRY IN BACKGROUND
+    // SISTEMA DI CODA E RETRY IN BACKGROUND (MODIFICATO PER NON BLOCCARE)
     const writeQueue = [];
     let isProcessingQueue = false;
 
@@ -647,11 +664,12 @@
       }
     }
 
-    async function saveStateToCloud() {
+    // 🛑 FUNZIONE NON PIU' BLOCCANTE (Tolto l'await)
+    function saveStateToCloud() {
       if (!roomCode) return;
       writeQueue.push({ roomCode: roomCode, statePayload: JSON.parse(JSON.stringify(GameState)) });
       if (navigator.onLine) {
-        await syncWriteQueue();
+        syncWriteQueue().catch(e => console.error("Errore sync in background:", e));
       } else {
         updateConnectionStatus();
       }
@@ -915,6 +933,15 @@
       return GameState.playerNames[id] || `Giocatore ${id}`;
     }
 
+    function getPlayerColor(senderId) {
+      for (let i = 1; i <= GameState.numPlayers; i++) {
+        if (GameState.playerIds[i] === senderId) {
+          return PLAYER_COLORS[(i - 1) % PLAYER_COLORS.length];
+        }
+      }
+      return '#9ca3af'; // Colore fallback grigio
+    }
+
     function getCounts(diceValues) {
       const counts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
       diceValues.forEach(val => { if (counts[val] !== undefined) counts[val]++; });
@@ -1069,6 +1096,12 @@
     const btnConfirmNewGame = document.getElementById('btnConfirmNewGame');
     const btnLeaveRoom = document.getElementById('btnLeaveRoom');
 
+    // Modale Edit Giocatori (Senza riavvio)
+    const editPlayersModal = document.getElementById('editPlayersModal');
+    const editPlayerSelectList = document.getElementById('editPlayerSelectList');
+    const btnCancelEditPlayers = document.getElementById('btnCancelEditPlayers');
+    const btnConfirmEditPlayers = document.getElementById('btnConfirmEditPlayers');
+
     const btnTargetScoreHeader = document.getElementById('btnTargetScoreHeader');
     const btnTargetScoreMobile = document.getElementById('btnTargetScoreMobile');
     const targetScoreHeaderLabel = document.getElementById('targetScoreHeaderLabel');
@@ -1122,7 +1155,7 @@
       }
     }
 
-    async function saveTargetScoreFromModal() {
+    function saveTargetScoreFromModal() {
       triggerHaptic(25);
       const val = parseInt(targetScoreInput.value);
       if (isNaN(val) || val < 1000) {
@@ -1134,7 +1167,20 @@
       addLog(`🎯 Obiettivo della stanza impostato a ${val.toLocaleString('it-IT')} pt`, true);
       closeTargetScoreModal();
       updateUI();
-      await saveStateToCloud();
+      saveStateToCloud();
+    }
+
+    function openEditPlayersModal() {
+      editPlayerSelectList.innerHTML = '';
+      for (let i = 1; i <= GameState.numPlayers; i++) {
+        const pName = getPlayerName(i);
+        const playerColor = PLAYER_COLORS[(i - 1) % PLAYER_COLORS.length];
+        const label = document.createElement('label');
+        label.className = 'flex items-center gap-2 p-2 bg-zinc-950 rounded-xl cursor-pointer border border-zinc-800 text-xs font-semibold';
+        label.innerHTML = `<input type="checkbox" data-player-index="${i}" checked class="w-4 h-4 accent-blue-500 rounded"> <span style="color: ${playerColor}">${pName}</span>`;
+        editPlayerSelectList.appendChild(label);
+      }
+      editPlayersModal.classList.remove('hidden');
     }
 
     function openNewGameModal() {
@@ -1172,16 +1218,6 @@
       });
     }
 
-    function appendChatMessage(sender, text, isSelf = false) {
-      if (!chatLogContainer) return;
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `text-xs leading-tight font-sans ${isSelf ? 'text-blue-300' : 'text-zinc-200'}`;
-      const time = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-      msgDiv.innerHTML = `<span class="text-[10px] text-zinc-500 mr-1">[${time}]</span><strong class="font-semibold ${isSelf ? 'text-blue-400' : 'text-amber-400'}">${sender}:</strong> <span>${escapeHtml(text)}</span>`;
-      chatLogContainer.appendChild(msgDiv);
-      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
-    }
-
     function renderChatHistory() {
       if (!chatLogContainer) return;
       chatLogContainer.innerHTML = '';
@@ -1191,9 +1227,10 @@
       }
       GameState.chatLogs.forEach(c => {
         const isSelf = c.senderId === myPlayerId;
+        const playerColor = getPlayerColor(c.senderId);
         const msgDiv = document.createElement('div');
-        msgDiv.className = `text-xs leading-tight font-sans ${isSelf ? 'text-blue-300' : 'text-zinc-200'}`;
-        msgDiv.innerHTML = `<span class="text-[10px] text-zinc-500 mr-1">[${c.time}]</span><strong class="font-semibold ${isSelf ? 'text-blue-400' : 'text-amber-400'}">${c.sender}:</strong> <span>${escapeHtml(c.message)}</span>`;
+        msgDiv.className = `text-xs leading-tight font-sans ${isSelf ? 'text-white' : 'text-zinc-200'}`;
+        msgDiv.innerHTML = `<span class="text-[10px] text-zinc-500 mr-1">[${c.time}]</span><strong class="font-bold" style="color: ${playerColor}">${c.sender}:</strong> <span>${escapeHtml(c.message)}</span>`;
         chatLogContainer.appendChild(msgDiv);
       });
       chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
@@ -1204,7 +1241,7 @@
     }
 
     if (chatForm) {
-      chatForm.addEventListener('submit', async (e) => {
+      chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const msg = chatInput.value.trim();
         if (!msg || !roomCode) return;
@@ -1218,7 +1255,7 @@
 
         chatInput.value = '';
         renderChatHistory();
-        await saveStateToCloud();
+        saveStateToCloud();
       });
     }
 
@@ -1261,6 +1298,9 @@
     function updateUI() {
       if (newGameModal && !newGameModal.classList.contains('hidden')) {
         newGameModal.classList.add('hidden');
+      }
+      if (editPlayersModal && !editPlayersModal.classList.contains('hidden')) {
+        editPlayersModal.classList.add('hidden');
       }
 
       TARGET_SCORE = GameState.targetScore || TARGET_SCORE;
@@ -1561,7 +1601,7 @@
       cubeEl.style.transform = `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
     }
 
-    async function rollDice() {
+    function rollDice() {
       if (!isMyTurn() || GameState.phase === 'rolling') return;
 
       if (GameState.phase === 'rolled') {
@@ -1604,7 +1644,7 @@
       sound.playDiceRoll();
       triggerHaptic(40);
       updateUI();
-      await saveStateToCloud();
+      saveStateToCloud(); // <-- NON BLOCCANTE
 
       const indicesToRoll = [];
       GameState.dice.forEach((d, idx) => {
@@ -1624,7 +1664,7 @@
 
       statusMessageEl.textContent = "Lancio...";
 
-      setTimeout(async () => {
+      setTimeout(() => {
         const newlyRolledValues = [];
         indicesToRoll.forEach(idx => {
           const val = getRandomDiceRoll();
@@ -1642,11 +1682,11 @@
         addLog(`${getPlayerName(GameState.activePlayer)} lancia: [ ${newlyRolledValues.join('-')} ]`);
 
         if (!hasScore) {
-          await triggerZong(newlyRolledValues);
+          triggerZong(newlyRolledValues);
         } else {
           statusMessageEl.textContent = `Usciti: [ ${newlyRolledValues.join(', ')} ]`;
           updateUI();
-          await saveStateToCloud();
+          saveStateToCloud();
         }
       }, 700);
     }
@@ -1668,7 +1708,7 @@
       return zongProbCache[key];
     }
 
-    async function triggerZong(rolledValues) {
+    function triggerZong(rolledValues) {
       sound.playZong();
       triggerHaptic(250);
       GameState.turnAccumulatedScore = 0;
@@ -1691,17 +1731,17 @@
       if (zongSubEl) zongSubEl.textContent = `Probabilità Zong: ${zongPercentage} (Nessun punto valido, turno perso!)`;
 
       zongModal.classList.remove('hidden');
-      await saveStateToCloud();
+      saveStateToCloud();
 
-      setTimeout(async () => {
+      setTimeout(() => {
         zongModal.classList.add('hidden');
         if (isMyTurn()) {
-          await endTurn();
+          endTurn();
         }
       }, 1500);
     }
 
-    async function endTurn() {
+    function endTurn() {
       zongModal.classList.add('hidden');
       GameState.turnAccumulatedScore = 0;
       GameState.inheritedScore = 0;
@@ -1715,10 +1755,10 @@
       }
       GameState.phase = 'ready';
       updateUI();
-      await saveStateToCloud();
+      saveStateToCloud();
     }
 
-    async function bankPoints() {
+    function bankPoints() {
       if (!isMyTurn() || GameState.phase !== 'rolled') return;
 
       const selectedValues = [];
@@ -1763,7 +1803,7 @@
 
       if (GameState.scores[GameState.activePlayer] >= TARGET_SCORE) {
         triggerVictory(GameState.activePlayer, GameState.scores[GameState.activePlayer]);
-        await saveStateToCloud();
+        saveStateToCloud();
         return;
       }
 
@@ -1782,10 +1822,10 @@
       GameState.isInheritedTurn = false;
       GameState.phase = 'inherit_choice';
       updateUI();
-      await saveStateToCloud();
+      saveStateToCloud();
     }
 
-    async function triggerVictory(player, finalScore) {
+    function triggerVictory(player, finalScore) {
       sound.playVictory();
       triggerHaptic([100, 50, 100, 50, 200]);
       
@@ -1850,7 +1890,7 @@
       winModal.classList.remove('hidden');
     }
 
-    async function onDiceClick(index) {
+    function onDiceClick(index) {
       if (!isMyTurn() || GameState.phase !== 'rolled') return;
       const d = GameState.dice[index];
       if (d.status === 'banked' || d.status === 'forced_free') return; 
@@ -1859,10 +1899,10 @@
       triggerHaptic(20);
       d.status = d.status === 'free' ? 'selected' : 'free';
       updateUI();
-      await saveStateToCloud();
+      saveStateToCloud();
     }
 
-    async function processSplitFives() {
+    function processSplitFives() {
       if (!isMyTurn() || GameState.phase !== 'rolled') return;
       let firstFound = false;
       GameState.dice.forEach(d => {
@@ -1884,11 +1924,11 @@
         addLog(`✂️ ${getPlayerName(GameState.activePlayer)} unisce due 5 (+100 pt)`, true);
         GameState.dice.forEach(d => { if (d.status === 'selected') d.status = 'free'; });
         updateUI();
-        await saveStateToCloud();
+        saveStateToCloud();
       }
     }
 
-    async function startNewGame(selectedPlayerIndices) {
+    function startNewGame(selectedPlayerIndices) {
       triggerHaptic(30);
       
       const shuffledIndices = [...selectedPlayerIndices];
@@ -1942,7 +1982,7 @@
       addLog(`🎲 Nuova partita avviata! Ordine di gioco estratto casualmente.`);
       initScoreboard();
       updateUI();
-      await saveStateToCloud();
+      saveStateToCloud();
     }
 
     // GESTIONE ACCESSO E RIENTRO
@@ -2110,6 +2150,84 @@
       });
     }
 
+    // GESTIONE NUOVA MODALE EDIT GIOCATORI SENZA RIAVVIO
+    if (roomBadge) {
+      roomBadge.addEventListener('click', () => {
+        if (!roomCode) return;
+        triggerHaptic(20);
+        openEditPlayersModal();
+      });
+    }
+
+    if (btnCancelEditPlayers) {
+      btnCancelEditPlayers.addEventListener('click', () => {
+        triggerHaptic(20);
+        editPlayersModal.classList.add('hidden');
+      });
+    }
+
+    if (btnConfirmEditPlayers) {
+      btnConfirmEditPlayers.addEventListener('click', () => {
+        triggerHaptic(20);
+        const checkboxes = editPlayerSelectList.querySelectorAll('input[type="checkbox"]');
+        const selectedIndices = [];
+        checkboxes.forEach(cb => {
+          if (cb.checked) {
+            selectedIndices.push(parseInt(cb.getAttribute('data-player-index')));
+          }
+        });
+
+        if (selectedIndices.length === 0) {
+          alert("Devi selezionare almeno un giocatore!");
+          return;
+        }
+
+        const newPlayerIds = {};
+        const newPlayerNames = {};
+        const newScores = {};
+        const newRecords = {};
+        const newInheritedRecords = {};
+        const newHasEntered = {};
+        const newZongCounts = {};
+        const newTotalRolls = {};
+        let newCount = 0;
+
+        selectedIndices.forEach(oldIdx => {
+          newCount++;
+          newPlayerIds[newCount] = GameState.playerIds[oldIdx];
+          newPlayerNames[newCount] = GameState.playerNames[oldIdx];
+          newScores[newCount] = GameState.scores[oldIdx];
+          newRecords[newCount] = GameState.records[oldIdx];
+          newInheritedRecords[newCount] = GameState.inheritedRecords[oldIdx];
+          newHasEntered[newCount] = GameState.hasEntered[oldIdx];
+          newZongCounts[newCount] = GameState.zongCounts[oldIdx];
+          newTotalRolls[newCount] = GameState.totalRolls[oldIdx];
+        });
+
+        GameState.numPlayers = newCount;
+        GameState.playerIds = newPlayerIds;
+        GameState.playerNames = newPlayerNames;
+        GameState.scores = newScores;
+        GameState.records = newRecords;
+        GameState.inheritedRecords = newInheritedRecords;
+        GameState.hasEntered = newHasEntered;
+        GameState.zongCounts = newZongCounts;
+        GameState.totalRolls = newTotalRolls;
+        
+        if (GameState.activePlayer > GameState.numPlayers) {
+          GameState.activePlayer = 1;
+          GameState.phase = 'ready'; 
+          GameState.turnAccumulatedScore = 0;
+          GameState.dice.forEach(d => d.status = 'free');
+        }
+
+        editPlayersModal.classList.add('hidden');
+        initScoreboard();
+        updateUI();
+        saveStateToCloud();
+      });
+    }
+
     window.onload = async function () {
       GameState.dice.forEach((d, i) => applyCubeRotation(cubeElements[i], d.value));
       diceContainers.forEach((el, index) => el.addEventListener('click', () => onDiceClick(index)));
@@ -2128,7 +2246,7 @@
       btnBank.addEventListener('click', () => { if (isMyTurn()) triggerHaptic(20); bankPoints(); });
       btnSplit5s.addEventListener('click', () => { if (isMyTurn()) triggerHaptic(20); processSplitFives(); });
 
-      btnInherit.addEventListener('click', async () => {
+      btnInherit.addEventListener('click', () => {
         if (!isMyTurn()) return;
         triggerHaptic(20);
         sound.init();
@@ -2138,7 +2256,7 @@
         rollDice();
       });
 
-      btnResetRoll.addEventListener('click', async () => {
+      btnResetRoll.addEventListener('click', () => {
         if (!isMyTurn()) return;
         triggerHaptic(20);
         sound.init();
